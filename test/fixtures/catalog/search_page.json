@@ -15,8 +15,8 @@
                 "title": "Results for \"nintendo\"",
                 "items": [
                   {
-                    "usItemId": "15949610846",
-                    "name": "Nintendo Switch 2 System",
+                    "usItemId": "910582148",
+                    "name": "Nintendo Switch OLED Model Video Game Console with White Joy-Con, 64 GB",
                     "price": 0,
                     "priceInfo": {
                       "itemPrice": "",
@@ -48,7 +48,7 @@
                             "values": [
                               {
                                 "key": "PRICE",
-                                "value": "499.00"
+                                "value": "399.00"
                               }
                             ]
                           },
@@ -57,7 +57,7 @@
                             "values": [
                               {
                                 "key": "LOW_PRICE",
-                                "value": "429.00"
+                                "value": "179.00"
                               }
                             ]
                           }
@@ -67,18 +67,18 @@
                       "subscriptionDualPrice": null,
                       "eaPricingText": ""
                     },
-                    "image": "https://i5.walmartimages.com/seo/Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
+                    "image": "https://i5.walmartimages.com/seo/Nintendo-Switch-OLED-Model-with-White-Joy-Con_c22aa8c1-bf4f-483d-a9ca-4d859a76301b.438540fe549cef8f553dbb7628d10a2f.jpeg",
                     "imageInfo": {
-                      "id": "D77488E461114ED991139E635AA1A2A7",
-                      "name": "Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
-                      "thumbnailUrl": "https://i5.walmartimages.com/seo/Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
+                      "id": "A3A2BC5CCB89423891D1BA28BE1857E9",
+                      "name": "Nintendo-Switch-OLED-Model-with-White-Joy-Con_c22aa8c1-bf4f-483d-a9ca-4d859a76301b.438540fe549cef8f553dbb7628d10a2f.jpeg",
+                      "thumbnailUrl": "https://i5.walmartimages.com/seo/Nintendo-Switch-OLED-Model-with-White-Joy-Con_c22aa8c1-bf4f-483d-a9ca-4d859a76301b.438540fe549cef8f553dbb7628d10a2f.jpeg",
                       "size": "104-104"
                     },
-                    "description": "Nintendo Switch 2 System",
-                    "shortDescription": "Nintendo Switch 2 System",
-                    "averageRating": 4.6,
-                    "numberOfReviews": 10852,
-                    "canonicalUrl": "/ip/Nintendo-Switch-2-System/15949610846?classType=REGULAR&athbdg=L1103",
+                    "description": "<li>Nintendo</li><li>Switch</li><li>OLED Model</li><li>With White Joy-Con</li>",
+                    "shortDescription": "<li>Nintendo</li><li>Switch</li><li>OLED Model</li><li>With White Joy-Con</li>",
+                    "averageRating": 4.5,
+                    "numberOfReviews": 2325,
+                    "canonicalUrl": "/ip/Nintendo-OLED-w-White-Joy-Con-White-Nintendo-Switch/910582148?classType=REGULAR",
                     "availabilityStatusV2": {
                       "display": "In stock",
                       "value": "IN_STOCK"
@@ -187,6 +187,76 @@
                   },
                   {},
                   {
+                    "usItemId": "15949610846",
+                    "name": "Nintendo Switch 2 System",
+                    "price": 0,
+                    "priceInfo": {
+                      "itemPrice": "",
+                      "linePrice": "",
+                      "wasPrice": "",
+                      "unitPrice": "",
+                      "shipPrice": "",
+                      "minPriceForVariant": "",
+                      "subscriptionPrice": "",
+                      "subscriptionString": "",
+                      "priceDisplayCondition": "",
+                      "finalCostByWeight": false,
+                      "submapType": "",
+                      "priceRangeString": "",
+                      "linePriceDisplay": "",
+                      "wasPriceSupportText": "",
+                      "memberPriceString": "",
+                      "subscriptionDiscountPrice": "",
+                      "priceDisplayType": null,
+                      "eaPricingPreText": "",
+                      "subscriptionPercentage": null,
+                      "savingsAmt": 0,
+                      "minPrice": 0,
+                      "priceDetails": {
+                        "currency": "USD",
+                        "priceLines": [
+                          {
+                            "lineType": "CURRENT_PRICE",
+                            "values": [
+                              {
+                                "key": "PRICE",
+                                "value": "499.00"
+                              }
+                            ]
+                          },
+                          {
+                            "lineType": "OPTIONS",
+                            "values": [
+                              {
+                                "key": "LOW_PRICE",
+                                "value": "429.00"
+                              }
+                            ]
+                          }
+                        ]
+                      },
+                      "savings": "",
+                      "subscriptionDualPrice": null,
+                      "eaPricingText": ""
+                    },
+                    "image": "https://i5.walmartimages.com/seo/Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
+                    "imageInfo": {
+                      "id": "D77488E461114ED991139E635AA1A2A7",
+                      "name": "Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
+                      "thumbnailUrl": "https://i5.walmartimages.com/seo/Nintendo-Switch-2-System_70372a2a-0166-4a96-b99e-41cfc5b972df.ce8b230cd4608afb4eda15604fc9fbff.png",
+                      "size": "104-104"
+                    },
+                    "description": "Nintendo Switch 2 System",
+                    "shortDescription": "Nintendo Switch 2 System",
+                    "averageRating": 4.6,
+                    "numberOfReviews": 10852,
+                    "canonicalUrl": "/ip/Nintendo-Switch-2-System/15949610846?classType=REGULAR&athbdg=L1103",
+                    "availabilityStatusV2": {
+                      "display": "In stock",
+                      "value": "IN_STOCK"
+                    }
+                  },
+                  {
                     "usItemId": "21944233",
                     "name": "Restored Nintendo Wii Console, White (Refurbished)",
                     "price": 0,
@@ -251,55 +321,6 @@
                       "offerType": null,
                       "headline": null
                     },
-                    "availabilityStatusV2": {
-                      "display": "In stock",
-                      "value": "IN_STOCK"
-                    }
-                  },
-                  {
-                    "usItemId": "704495423",
-                    "name": "Nintendo 64 N64 Video Game Console Bundle with Matching Controller and Cables",
-                    "price": 116,
-                    "priceInfo": {
-                      "itemPrice": "",
-                      "linePrice": "$116.97",
-                      "wasPrice": "",
-                      "unitPrice": "",
-                      "shipPrice": "",
-                      "minPriceForVariant": "",
-                      "subscriptionPrice": "",
-                      "subscriptionString": "",
-                      "priceDisplayCondition": "",
-                      "finalCostByWeight": false,
-                      "submapType": "",
-                      "priceRangeString": "Options from $104.95",
-                      "dutyFee": null,
-                      "linePriceDisplay": "$116.97",
-                      "wasPriceSupportText": "",
-                      "memberPriceString": "",
-                      "subscriptionDiscountPrice": "",
-                      "priceDisplayType": "UNKNOWN",
-                      "eaPricingPreText": "",
-                      "subscriptionPercentage": null,
-                      "savingsAmt": 0,
-                      "minPrice": 104.95,
-                      "savings": "",
-                      "subscriptionDualPrice": null,
-                      "eaPricingText": "",
-                      "isB2BPrice": false
-                    },
-                    "image": "https://i5.walmartimages.com/seo/Nintendo-64-N64-Video-Game-Console-Bundle-with-Matching-Controller-and-Cables_41862292-435f-4b90-8092-802344cb33f3.f5aeb78c6a0bf2133f6c2da2ff5e02da.jpeg",
-                    "imageInfo": {
-                      "id": "BBED884B0DD746108651BBC8AD650397",
-                      "name": "Nintendo-64-N64-Video-Game-Console-Bundle-with-Matching-Controller-and-Cables_41862292-435f-4b90-8092-802344cb33f3.f5aeb78c6a0bf2133f6c2da2ff5e02da.jpeg",
-                      "thumbnailUrl": "https://i5.walmartimages.com/seo/Nintendo-64-N64-Video-Game-Console-Bundle-with-Matching-Controller-and-Cables_41862292-435f-4b90-8092-802344cb33f3.f5aeb78c6a0bf2133f6c2da2ff5e02da.jpeg",
-                      "size": "104-104"
-                    },
-                    "description": "Fully tested and and cleaned. Works great! The console is in very good clean condition and the controller joystick is firm and plays very well. Includes console, jumper pak, jumper pak cover, power",
-                    "shortDescription": "Fully tested and and cleaned. Works great! The console is in very good clean condition and the controller joystick is firm and plays very well. Includes console, jumper pak, jumper pak cover, power",
-                    "averageRating": 3.8,
-                    "numberOfReviews": 264,
-                    "canonicalUrl": "/ip/Nintendo-64-N64-Video-Game-Console-Bundle-with-Matching-Controller-and-Cables/704495423?classType=REGULAR",
                     "availabilityStatusV2": {
                       "display": "In stock",
                       "value": "IN_STOCK"

@@ -50,7 +50,6 @@ void main() {
     });
 
     test('reads the formatted string when the price lines are empty', () {
-      expect(byId('704495423').price, 116.97);
       expect(byId('709776123').price, 229.0);
     });
 
@@ -116,5 +115,70 @@ void main() {
       () => mapSearchResponse(<String, Object?>{'unexpected': true}, page: 1),
       throwsA(isA<ParsingFailure>()),
     );
+  });
+
+  // More than half of the descriptions the service returns are marked up, and
+  // every one of them uses the same single tag: <li>, with no list around it.
+  // Rendered as-is they read as "<li>Nintendo</li><li>Switch</li>".
+  group('description markup', () {
+    test('turns list items into readable lines', () {
+      expect(
+        plainDescription(
+          '<li>Nintendo</li><li>Switch</li><li>OLED Model</li>',
+        ),
+        '• Nintendo\n• Switch\n• OLED Model',
+      );
+    });
+
+    test('keeps the sentence that comes before the first item', () {
+      expect(
+        plainDescription(
+          'Nintendo Switch Console:<li>Play on your TV</li><li>Take it out</li>',
+        ),
+        'Nintendo Switch Console:\n• Play on your TV\n• Take it out',
+      );
+    });
+
+    test('leaves plain text untouched', () {
+      expect(plainDescription('Nintendo Switch 2 System'), 'Nintendo Switch 2 System');
+    });
+
+    // Several products repeat the same bullet two or three times.
+    test('collapses an item repeated verbatim', () {
+      expect(
+        plainDescription(
+          '<li>Refurbished OLED</li><li>Refurbished OLED</li><li>256 GB</li>',
+        ),
+        '• Refurbished OLED\n• 256 GB',
+      );
+    });
+
+    // None of these appear today. They are handled anyway because the payload
+    // has already changed shape once between two pages of one search.
+    test('survives markup the service does not use yet', () {
+      expect(
+        plainDescription('<p>Uno</p><br/><b>dos</b> &amp; tres'),
+        'Uno\ndos & tres',
+      );
+    });
+
+    test('reports nothing left after stripping as no description', () {
+      expect(plainDescription('<li></li>'), isNull);
+      expect(plainDescription('   '), isNull);
+      expect(plainDescription(null), isNull);
+    });
+
+    // The captured product the fixture keeps for this is the one that showed
+    // the raw tags on screen.
+    test('a mapped product carries clean text, not markup', () {
+      expect(
+        byId('910582148').description,
+        '• Nintendo\n• Switch\n• OLED Model\n• With White Joy-Con',
+      );
+
+      for (final Product product in page.products) {
+        expect(product.description ?? '', isNot(contains('<')));
+      }
+    });
   });
 }

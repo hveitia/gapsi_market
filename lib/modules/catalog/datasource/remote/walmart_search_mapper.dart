@@ -99,8 +99,9 @@ Product? _toProduct(Map<String, Object?> item) {
     thumbnailUrl:
         _asString(_at(item, <String>['imageInfo', 'thumbnailUrl'])) ??
         _asString(item['image']),
-    description:
-        _asString(item['description']) ?? _asString(item['shortDescription']),
+    description: plainDescription(
+      _asString(item['description']) ?? _asString(item['shortDescription']),
+    ),
     rating: _asDouble(item['averageRating']),
     reviewCount: _asInt(item['numberOfReviews']),
     productUrl: path == null ? null : '$_walmartOrigin$path',
@@ -171,6 +172,65 @@ double? _money(String? text) {
     return null;
   }
   return double.tryParse(match.group(0)!.replaceAll(',', ''));
+}
+
+/// Turns a description into text a screen can render.
+///
+/// More than half of the descriptions the service returns are marked up, and
+/// every one of them uses a single tag: `<li>`, with no list around it. Rendered
+/// as they arrive they read as `<li>Nintendo</li><li>Switch</li>`.
+///
+/// List items become bullet lines and the sentence some products put before the
+/// first item is kept as its own line. Anything else is stripped and entities
+/// are decoded, none of which the payload uses today: it is handled anyway
+/// because this response already changed shape once between two pages of the
+/// same search, and markup leaking onto a screen is worse than a few lines that
+/// never run.
+String? plainDescription(String? raw) {
+  if (raw == null) {
+    return null;
+  }
+
+  final String withBullets = raw
+      .replaceAll(RegExp(r'</li\s*>', caseSensitive: false), '')
+      .replaceAll(RegExp(r'<li[^>]*>', caseSensitive: false), '\n• ')
+      .replaceAll(RegExp(r'<br\s*/?>|</p\s*>', caseSensitive: false), '\n')
+      .replaceAll(RegExp('<[^>]*>'), '');
+
+  final String decoded = _decodeEntities(withBullets);
+
+  // Several products repeat the same bullet two or three times.
+  final Set<String> seen = <String>{};
+  final List<String> lines = <String>[];
+  for (final String line in decoded.split('\n')) {
+    final String trimmed = line.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (trimmed.isEmpty || trimmed == '•') {
+      continue;
+    }
+    if (seen.add(trimmed)) {
+      lines.add(trimmed);
+    }
+  }
+
+  return lines.isEmpty ? null : lines.join('\n');
+}
+
+const Map<String, String> _entities = <String, String>{
+  '&amp;': '&',
+  '&lt;': '<',
+  '&gt;': '>',
+  '&quot;': '"',
+  '&#39;': "'",
+  '&apos;': "'",
+  '&nbsp;': ' ',
+};
+
+String _decodeEntities(String text) {
+  String decoded = text;
+  for (final MapEntry<String, String> entity in _entities.entries) {
+    decoded = decoded.replaceAll(entity.key, entity.value);
+  }
+  return decoded;
 }
 
 Object? _at(Map<String, Object?> root, List<String> path) {
