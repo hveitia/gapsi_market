@@ -3,14 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:rekluti_test/app.dart';
 import 'package:rekluti_test/configs/router/app_router.dart';
-import 'package:rekluti_test/configs/router/app_routes.dart';
 import 'package:rekluti_test/configs/router/go_router_refresh_stream.dart';
 import 'package:rekluti_test/modules/auth/auth_module.dart';
 import 'package:rekluti_test/modules/auth/bloc/auth_bloc.dart';
 import 'package:rekluti_test/modules/auth/bloc/auth_event.dart';
 import 'package:rekluti_test/modules/auth/datasource/local/auth_migrations.dart';
 import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
-import 'package:rekluti_test/shared/database/app_migrations.dart';
+import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
+import 'package:rekluti_test/modules/catalog/bloc/search_history_bloc.dart';
+import 'package:rekluti_test/modules/catalog/catalog_module.dart';
+import 'package:rekluti_test/modules/catalog/datasource/local/catalog_migrations.dart';
+import 'package:rekluti_test/modules/catalog/presenter/catalog_routes.dart';
 import 'package:rekluti_test/shared/database/migration.dart';
 import 'package:rekluti_test/shared/di/service_locator.dart';
 
@@ -25,16 +28,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await configureDependencies(
-    migrations: <Migration>[...appMigrations, ...authMigrations],
+    // Order matters and is fixed: migrations are applied by position, so a new
+    // module appends and never inserts.
+    migrations: <Migration>[...authMigrations, ...catalogMigrations],
   );
   registerAuthDependencies(locator);
+  registerCatalogDependencies(locator);
 
   final AuthBloc authBloc = locator<AuthBloc>()
     ..add(const AuthSessionRequested());
 
   final GoRouter router = buildAppRouter(
     initialLocation: AuthRoutePaths.splash,
-    routes: <RouteBase>[...appRoutes, ...authRoutes],
+    routes: <RouteBase>[...authRoutes, ...catalogRoutes],
     // Re-evaluates the guard whenever the session changes, so signing in moves
     // the user without any screen having to navigate.
     refreshListenable: GoRouterRefreshStream(authBloc.stream),
@@ -43,8 +49,14 @@ Future<void> main() async {
   );
 
   runApp(
-    BlocProvider<AuthBloc>.value(
-      value: authBloc,
+    MultiBlocProvider(
+      providers: <BlocProvider<dynamic>>[
+        BlocProvider<AuthBloc>.value(value: authBloc),
+        BlocProvider<SearchBloc>.value(value: locator<SearchBloc>()),
+        BlocProvider<SearchHistoryBloc>.value(
+          value: locator<SearchHistoryBloc>(),
+        ),
+      ],
       child: GapsiMarketApp(router: router),
     ),
   );

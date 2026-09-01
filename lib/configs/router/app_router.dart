@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:rekluti_test/configs/router/app_routes.dart';
 
 /// Every location the app can navigate to.
 ///
@@ -12,19 +11,18 @@ abstract final class AppRoutePaths {
 
 /// Builds the app's router.
 ///
-/// [routes], [redirect] and [refreshListenable] are parameters rather than hard
-/// coded values so each module can
-/// contribute its own screens, the same way modules contribute their database
-/// migrations. Nothing here has to import every feature.
+/// [routes], [redirect] and [refreshListenable] are all parameters, so this
+/// file never imports a feature: each module contributes its own screens and
+/// its own rules, the same way it contributes its database migrations.
 GoRouter buildAppRouter({
-  List<RouteBase>? routes,
+  required List<RouteBase> routes,
   String initialLocation = AppRoutePaths.home,
   Listenable? refreshListenable,
   GoRouterRedirect? redirect,
 }) {
   return GoRouter(
     initialLocation: initialLocation,
-    routes: routes ?? appRoutes,
+    routes: routes,
     // Both are parameters so this file never imports a feature: the module that
     // owns the rule supplies it, and the composition root wires the two.
     refreshListenable: refreshListenable,

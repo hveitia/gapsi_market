@@ -10,10 +10,18 @@ Future<void> pumpApp(WidgetTester tester, GoRouter router) async {
 }
 
 void main() {
-  testWidgets('boots into the initial route', (WidgetTester tester) async {
-    await pumpApp(tester, buildAppRouter());
+  List<RouteBase> homeOnly() => <RouteBase>[
+    GoRoute(
+      path: '/',
+      builder: (BuildContext context, GoRouterState state) =>
+          const Scaffold(body: Text('inicio')),
+    ),
+  ];
 
-    expect(find.byType(Scaffold), findsOneWidget);
+  testWidgets('boots into the initial route', (WidgetTester tester) async {
+    await pumpApp(tester, buildAppRouter(routes: homeOnly()));
+
+    expect(find.text('inicio'), findsOneWidget);
   });
 
   // Modules contribute their own routes instead of a central file importing
@@ -42,7 +50,10 @@ void main() {
   testWidgets('names the offending location when a route is unknown', (
     WidgetTester tester,
   ) async {
-    await pumpApp(tester, buildAppRouter(initialLocation: '/nope'));
+    await pumpApp(
+      tester,
+      buildAppRouter(initialLocation: '/nope', routes: homeOnly()),
+    );
 
     expect(find.textContaining('/nope'), findsOneWidget);
   });
