@@ -15,6 +15,7 @@ import 'package:rekluti_test/modules/auth/presenter/widgets/auth_back_button.dar
 import 'package:rekluti_test/modules/auth/presenter/widgets/auth_buttons.dart';
 import 'package:rekluti_test/modules/auth/presenter/widgets/auth_error_banner.dart';
 import 'package:rekluti_test/modules/auth/presenter/widgets/auth_field.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 /// Sign up form.
 ///
@@ -64,112 +65,119 @@ class _SignUpViewState extends State<SignUpView> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppShapes.screenPadding,
-            vertical: 12,
-          ),
-          child: Form(
-            key: _formKey,
-            child: AutofillGroup(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  AuthBackButton(onPressed: () => context.pop()),
-                  const SizedBox(height: 20),
-                  Text('Crear cuenta', style: AppTypography.titleLg),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tus datos se guardan cifrados en este dispositivo. '
-                    'No salen de tu teléfono.',
-                    style: AppTypography.meta.copyWith(height: 1.5),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: <Widget>[
-                          const SizedBox(height: 20),
-                          if (submission is FormRejected) ...<Widget>[
-                            AuthErrorBanner(
-                              message: AuthMessages.submission(
-                                submission.reason,
-                              ),
-                            ),
-                            const SizedBox(height: 18),
-                          ],
-                          AuthField(
-                            label: 'Nombre',
-                            controller: _name,
-                            hint: 'Tu nombre',
-                            keyboardType: TextInputType.name,
-                            autofillHints: const <String>[AutofillHints.name],
-                            validator: (String? value) => AuthMessages.name(
-                              CredentialsValidator.validateName(value),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          AuthField(
-                            label: 'Correo',
-                            controller: _email,
-                            hint: 'tu@correo.com',
-                            keyboardType: TextInputType.emailAddress,
-                            autofillHints: const <String>[AutofillHints.email],
-                            validator: (String? value) => AuthMessages.email(
-                              CredentialsValidator.validateEmail(value),
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          AuthField(
-                            label: 'Contraseña',
-                            controller: _password,
-                            obscure: true,
-                            textInputAction: TextInputAction.done,
-                            autofillHints: const <String>[
-                              AutofillHints.newPassword,
-                            ],
-                            helper:
-                                'Mínimo '
-                                '${CredentialsValidator.minPasswordLength} '
-                                'caracteres, con una letra y un número',
-                            onSubmitted: _submit,
-                            validator: (String? value) => AuthMessages.password(
-                              CredentialsValidator.validatePassword(value),
-                            ),
-                          ),
-                        ],
-                      ),
+        child: ContentWidth(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppShapes.screenPadding,
+              vertical: 12,
+            ),
+            child: Form(
+              key: _formKey,
+              child: AutofillGroup(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    AuthBackButton(onPressed: () => context.pop()),
+                    const SizedBox(height: 20),
+                    Text('Crear cuenta', style: AppTypography.titleLg),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tus datos se guardan cifrados en este dispositivo. '
+                      'No salen de tu teléfono.',
+                      style: AppTypography.meta.copyWith(height: 1.5),
                     ),
-                  ),
-                  PrimaryButton(
-                    label: 'Crear cuenta',
-                    onPressed: _submit,
-                    isLoading: submission is FormInProgress,
-                  ),
-                  const SizedBox(height: 6),
-                  Center(
-                    child: TextButton(
-                      onPressed: () =>
-                          context.pushReplacement(AuthRoutePaths.signIn),
-                      child: RichText(
-                        text: TextSpan(
-                          style: AppTypography.label.copyWith(
-                            color: AppColors.inkSoft,
-                          ),
-                          children: <InlineSpan>[
-                            const TextSpan(text: '¿Ya tienes cuenta? '),
-                            TextSpan(
-                              text: 'Inicia sesión',
-                              style: AppTypography.label.copyWith(
-                                color: AppColors.accent,
-                                fontWeight: FontWeight.w700,
+                    Expanded(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: <Widget>[
+                            const SizedBox(height: 20),
+                            if (submission is FormRejected) ...<Widget>[
+                              AuthErrorBanner(
+                                message: AuthMessages.submission(
+                                  submission.reason,
+                                ),
                               ),
+                              const SizedBox(height: 18),
+                            ],
+                            AuthField(
+                              label: 'Nombre',
+                              controller: _name,
+                              hint: 'Tu nombre',
+                              keyboardType: TextInputType.name,
+                              autofillHints: const <String>[AutofillHints.name],
+                              validator: (String? value) => AuthMessages.name(
+                                CredentialsValidator.validateName(value),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            AuthField(
+                              label: 'Correo',
+                              controller: _email,
+                              hint: 'tu@correo.com',
+                              keyboardType: TextInputType.emailAddress,
+                              autofillHints: const <String>[
+                                AutofillHints.email,
+                              ],
+                              validator: (String? value) => AuthMessages.email(
+                                CredentialsValidator.validateEmail(value),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            AuthField(
+                              label: 'Contraseña',
+                              controller: _password,
+                              obscure: true,
+                              textInputAction: TextInputAction.done,
+                              autofillHints: const <String>[
+                                AutofillHints.newPassword,
+                              ],
+                              helper:
+                                  'Mínimo '
+                                  '${CredentialsValidator.minPasswordLength} '
+                                  'caracteres, con una letra y un número',
+                              onSubmitted: _submit,
+                              validator: (String? value) =>
+                                  AuthMessages.password(
+                                    CredentialsValidator.validatePassword(
+                                      value,
+                                    ),
+                                  ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    PrimaryButton(
+                      label: 'Crear cuenta',
+                      onPressed: _submit,
+                      isLoading: submission is FormInProgress,
+                    ),
+                    const SizedBox(height: 6),
+                    Center(
+                      child: TextButton(
+                        onPressed: () =>
+                            context.pushReplacement(AuthRoutePaths.signIn),
+                        child: RichText(
+                          text: TextSpan(
+                            style: AppTypography.label.copyWith(
+                              color: AppColors.inkSoft,
+                            ),
+                            children: <InlineSpan>[
+                              const TextSpan(text: '¿Ya tienes cuenta? '),
+                              TextSpan(
+                                text: 'Inicia sesión',
+                                style: AppTypography.label.copyWith(
+                                  color: AppColors.accent,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

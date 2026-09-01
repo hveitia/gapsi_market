@@ -63,15 +63,21 @@ class CatalogMessage extends StatelessWidget {
               child: Icon(
                 icon,
                 size: 46,
-                color: isError
-                    ? AppColors.dangerFg
-                    : const Color(0xFFD99A6C),
+                color: isError ? AppColors.dangerFg : const Color(0xFFD99A6C),
               ),
             ),
             const SizedBox(height: 24),
-            Text(title, style: AppTypography.titleLg, textAlign: TextAlign.center),
+            Text(
+              title,
+              style: AppTypography.titleLg,
+              textAlign: TextAlign.center,
+            ),
             const SizedBox(height: 10),
-            Text(detail, style: AppTypography.body, textAlign: TextAlign.center),
+            Text(
+              detail,
+              style: AppTypography.body,
+              textAlign: TextAlign.center,
+            ),
             if (suggestions.isNotEmpty) ...<Widget>[
               const SizedBox(height: 20),
               Wrap(
@@ -87,8 +93,7 @@ class CatalogMessage extends StatelessWidget {
                         side: const BorderSide(color: AppColors.hairline),
                         // Chips sit below the 48 minimum, so the tap area is
                         // padded out to reach it.
-                        materialTapTargetSize:
-                            MaterialTapTargetSize.padded,
+                        materialTapTargetSize: MaterialTapTargetSize.padded,
                       ),
                     )
                     .toList(),
@@ -140,9 +145,7 @@ class CatalogMessage extends StatelessWidget {
                 ),
                 child: Text(
                   code!,
-                  style: AppTypography.meta.copyWith(
-                    color: AppColors.dangerFg,
-                  ),
+                  style: AppTypography.meta.copyWith(color: AppColors.dangerFg),
                 ),
               ),
             ],

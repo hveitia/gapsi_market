@@ -20,6 +20,7 @@ import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.da
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_skeleton.dart';
 import 'package:rekluti_test/shared/errors/failure.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 class _MockSearch extends MockBloc<SearchEvent, SearchState>
     implements SearchBloc {}
@@ -329,6 +330,66 @@ void main() {
 
       expect(find.text('iniciar sesión'), findsNothing);
       expect(find.text('Hola, buenas compras'), findsOneWidget);
+    });
+  });
+
+  group('screen size', () {
+    void sizeTo(WidgetTester tester, double width) {
+      tester.view
+        ..physicalSize = Size(width, 1200)
+        ..devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+    }
+
+    SearchResults results() => SearchResults(
+      term: 'nintendo',
+      products: <Product>[product('a'), product('b')],
+      page: 1,
+      totalResults: 860,
+    );
+
+    testWidgets('stacks results in one column on a phone', (
+      WidgetTester tester,
+    ) async {
+      sizeTo(tester, 400);
+      await pumpSearch(tester, results());
+
+      final Offset first = tester.getTopLeft(find.byType(ProductCard).at(0));
+      final Offset second = tester.getTopLeft(find.byType(ProductCard).at(1));
+
+      expect(second.dx, first.dx);
+      expect(second.dy, greaterThan(first.dy));
+    });
+
+    // The design puts results side by side once the window is wide enough,
+    // rather than leaving one column of cards floating in empty space.
+    testWidgets('puts results side by side once there is room', (
+      WidgetTester tester,
+    ) async {
+      sizeTo(tester, 900);
+      await pumpSearch(tester, results());
+
+      final Offset first = tester.getTopLeft(find.byType(ProductCard).at(0));
+      final Offset second = tester.getTopLeft(find.byType(ProductCard).at(1));
+
+      expect(second.dx, greaterThan(first.dx));
+      expect(second.dy, first.dy);
+    });
+
+    // A line of text running the full width of a desktop window is hard to
+    // read, so content is capped however much room there is.
+    testWidgets('never lets content run the full width of a wide window', (
+      WidgetTester tester,
+    ) async {
+      sizeTo(tester, 1400);
+      await pumpSearch(tester, results());
+
+      final double cardWidth = tester
+          .getSize(find.byType(ProductCard).first)
+          .width;
+
+      expect(cardWidth, lessThanOrEqualTo(AppBreakpoints.maxContentWidth));
+      expect(cardWidth, lessThan(1400 / 2));
     });
   });
 }

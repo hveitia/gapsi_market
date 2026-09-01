@@ -44,7 +44,8 @@ abstract final class CatalogMessages {
   static String? code(Failure failure) => switch (failure) {
     final ServerFailure f when f.statusCode != null =>
       'Código ${f.statusCode} · servicio no disponible',
-    final RequestFailure f when f.statusCode != null => 'Código ${f.statusCode}',
+    final RequestFailure f when f.statusCode != null =>
+      'Código ${f.statusCode}',
     _ => null,
   };
 }

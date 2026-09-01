@@ -146,10 +146,7 @@ class _End extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 22),
       child: Center(
-        child: Text(
-          'No hay más resultados',
-          style: AppTypography.meta,
-        ),
+        child: Text('No hay más resultados', style: AppTypography.meta),
       ),
     );
   }

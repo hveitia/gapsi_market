@@ -20,7 +20,8 @@ abstract final class AuthMessages {
       PasswordValidationError.empty => 'La contraseña es obligatoria',
       PasswordValidationError.tooShort =>
         'Debe tener al menos ${CredentialsValidator.minPasswordLength} caracteres',
-      PasswordValidationError.missingLetter => 'Debe incluir al menos una letra',
+      PasswordValidationError.missingLetter =>
+        'Debe incluir al menos una letra',
       PasswordValidationError.missingDigit => 'Debe incluir al menos un número',
     };
   }

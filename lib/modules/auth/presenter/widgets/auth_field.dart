@@ -56,10 +56,7 @@ class _AuthFieldState extends State<AuthField> {
       children: <Widget>[
         Padding(
           padding: const EdgeInsets.only(left: 4, bottom: 7),
-          child: Text(
-            widget.label.toUpperCase(),
-            style: AppTypography.kicker,
-          ),
+          child: Text(widget.label.toUpperCase(), style: AppTypography.kicker),
         ),
         TextFormField(
           controller: widget.controller,

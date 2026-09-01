@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -19,6 +21,7 @@ import 'package:rekluti_test/modules/catalog/presenter/widgets/pagination_footer
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_skeleton.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/search_field.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 /// Terms worth offering when a search returns nothing.
 ///
@@ -267,44 +270,99 @@ class _SearchViewState extends State<SearchView> {
   }
 
   Widget _results(SearchResults results) {
-    return ListView.separated(
+    final bool wide = AppBreakpoints.isWide(context);
+
+    return CustomScrollView(
       controller: _scroll,
-      padding: const EdgeInsets.fromLTRB(
-        AppShapes.screenPadding,
-        4,
-        AppShapes.screenPadding,
-        // Room for the floating navigation bar.
-        100,
-      ),
-      itemCount: results.products.length + 2,
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: index == 0 ? 0 : 14),
-      itemBuilder: (BuildContext context, int index) {
-        if (index == 0) {
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 14),
-            child: Text(
-              CatalogFormats.resultsHeadline(
-                results.totalResults,
-                results.term,
-              ),
-              style: AppTypography.meta,
+      slivers: <Widget>[
+        SliverContentWidth(
+          sliver: SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppShapes.screenPadding,
+              4,
+              AppShapes.screenPadding,
+              14,
             ),
-          );
-        }
-        if (index <= results.products.length) {
-          final Product product = results.products[index - 1];
-          return ProductCard(
-            product: product,
-            onTap: () => widget.onProductSelected(context, product),
-          );
-        }
-        return PaginationFooter(
-          state: results,
-          onRetry: () =>
-              context.read<SearchBloc>().add(const SearchRetryRequested()),
-        );
-      },
+            sliver: SliverToBoxAdapter(
+              child: Text(
+                CatalogFormats.resultsHeadline(
+                  results.totalResults,
+                  results.term,
+                ),
+                style: AppTypography.meta,
+              ),
+            ),
+          ),
+        ),
+        SliverContentWidth(
+          sliver: SliverPadding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppShapes.screenPadding,
+            ),
+            sliver: wide ? _grid(results) : _list(results),
+          ),
+        ),
+        SliverContentWidth(
+          sliver: SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppShapes.screenPadding,
+              0,
+              AppShapes.screenPadding,
+              // Room for the floating navigation bar.
+              100,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: PaginationFooter(
+                state: results,
+                onRetry: () => context.read<SearchBloc>().add(
+                  const SearchRetryRequested(),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
+  }
+
+  Widget _list(SearchResults results) {
+    return SliverList.separated(
+      itemCount: results.products.length,
+      separatorBuilder: (BuildContext context, int index) =>
+          const SizedBox(height: 14),
+      itemBuilder: (BuildContext context, int index) =>
+          _card(results.products[index]),
+    );
+  }
+
+  Widget _grid(SearchResults results) {
+    return SliverGrid.builder(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        // A measured height rather than an aspect ratio, so a card cannot clip
+        // when the system text size grows.
+        mainAxisExtent: _cardHeight(context),
+      ),
+      itemCount: results.products.length,
+      itemBuilder: (BuildContext context, int index) =>
+          _card(results.products[index]),
+    );
+  }
+
+  Widget _card(Product product) {
+    return ProductCard(
+      product: product,
+      onTap: () => widget.onProductSelected(context, product),
+    );
+  }
+
+  /// The taller of the thumbnail and the text beside it, plus the card padding.
+  static double _cardHeight(BuildContext context) {
+    final TextScaler scaler = MediaQuery.textScalerOf(context);
+    final double text =
+        scaler.scale(15) * 2 * 1.25 + 8 + scaler.scale(19) * 1.3;
+    return 24 + math.max(82, text);
   }
 }

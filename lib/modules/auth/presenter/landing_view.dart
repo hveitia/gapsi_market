@@ -7,6 +7,7 @@ import 'package:rekluti_test/configs/theme/app_theme.dart';
 import 'package:rekluti_test/configs/theme/app_typography.dart';
 import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
 import 'package:rekluti_test/modules/auth/presenter/widgets/auth_buttons.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 /// The first screen a signed out user meets.
 ///
@@ -20,48 +21,50 @@ class LandingView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppShapes.screenPadding,
-            vertical: 24,
-          ),
-          child: Column(
-            children: <Widget>[
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      const SizedBox(height: 32),
-                      _brand(),
-                      const SizedBox(height: 26),
-                      const _Highlights(),
-                      const SizedBox(height: 32),
-                    ],
+        child: ContentWidth(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppShapes.screenPadding,
+              vertical: 24,
+            ),
+            child: Column(
+              children: <Widget>[
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: <Widget>[
+                        const SizedBox(height: 32),
+                        _brand(),
+                        const SizedBox(height: 26),
+                        const _Highlights(),
+                        const SizedBox(height: 32),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              PrimaryButton(
-                label: 'Crear cuenta',
-                onPressed: () => context.push(AuthRoutePaths.signUp),
-              ),
-              const SizedBox(height: 12),
-              SecondaryButton(
-                label: 'Ya tengo cuenta',
-                onPressed: () => context.push(AuthRoutePaths.signIn),
-              ),
-              const SizedBox(height: 10),
-              TextButton(
-                onPressed: () => context.go(AppRoutePaths.home),
-                child: Text(
-                  'Explorar sin cuenta →',
-                  style: AppTypography.label.copyWith(
-                    color: AppColors.accent,
-                    fontWeight: FontWeight.w700,
+                PrimaryButton(
+                  label: 'Crear cuenta',
+                  onPressed: () => context.push(AuthRoutePaths.signUp),
+                ),
+                const SizedBox(height: 12),
+                SecondaryButton(
+                  label: 'Ya tengo cuenta',
+                  onPressed: () => context.push(AuthRoutePaths.signIn),
+                ),
+                const SizedBox(height: 10),
+                TextButton(
+                  onPressed: () => context.go(AppRoutePaths.home),
+                  child: Text(
+                    'Explorar sin cuenta →',
+                    style: AppTypography.label.copyWith(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

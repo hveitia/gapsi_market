@@ -12,6 +12,7 @@ import 'package:rekluti_test/modules/catalog/presenter/catalog_formats.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/catalog_message.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 /// The products saved on this device.
 class FavoritesView extends StatelessWidget {
@@ -61,35 +62,39 @@ class FavoritesView extends StatelessWidget {
   Widget _grid(BuildContext context, List<Product> products) {
     return CustomScrollView(
       slivers: <Widget>[
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            AppShapes.screenPadding,
-            8,
-            AppShapes.screenPadding,
-            18,
-          ),
-          sliver: SliverToBoxAdapter(child: _header(products.length)),
-        ),
-        SliverPadding(
-          padding: const EdgeInsets.fromLTRB(
-            AppShapes.screenPadding,
-            0,
-            AppShapes.screenPadding,
-            100,
-          ),
-          sliver: SliverGrid.builder(
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              // A maximum width rather than a fixed column count, so a wider
-              // screen gets more columns instead of stretched cards.
-              maxCrossAxisExtent: 220,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 0.68,
+        SliverContentWidth(
+          sliver: SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppShapes.screenPadding,
+              8,
+              AppShapes.screenPadding,
+              18,
             ),
-            itemCount: products.length,
-            itemBuilder: (BuildContext context, int index) => _FavoriteCard(
-              product: products[index],
-              onTap: () => onProductSelected(context, products[index]),
+            sliver: SliverToBoxAdapter(child: _header(products.length)),
+          ),
+        ),
+        SliverContentWidth(
+          sliver: SliverPadding(
+            padding: const EdgeInsets.fromLTRB(
+              AppShapes.screenPadding,
+              0,
+              AppShapes.screenPadding,
+              100,
+            ),
+            sliver: SliverGrid.builder(
+              gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+                // A maximum width rather than a fixed column count, so a wider
+                // screen gets more columns instead of stretched cards.
+                maxCrossAxisExtent: 220,
+                mainAxisSpacing: 14,
+                crossAxisSpacing: 14,
+                childAspectRatio: 0.68,
+              ),
+              itemCount: products.length,
+              itemBuilder: (BuildContext context, int index) => _FavoriteCard(
+                product: products[index],
+                onTap: () => onProductSelected(context, products[index]),
+              ),
             ),
           ),
         ),

@@ -7,6 +7,7 @@ import 'package:rekluti_test/modules/catalog/domain/product.dart';
 import 'package:rekluti_test/modules/catalog/presenter/catalog_formats.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 /// Everything known about one product.
@@ -26,14 +27,16 @@ class ProductDetailView extends StatelessWidget {
       body: CustomScrollView(
         slivers: <Widget>[
           SliverToBoxAdapter(child: _Hero(product: product)),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(
-              AppShapes.screenPadding,
-              22,
-              AppShapes.screenPadding,
-              32,
+          SliverContentWidth(
+            sliver: SliverPadding(
+              padding: const EdgeInsets.fromLTRB(
+                AppShapes.screenPadding,
+                22,
+                AppShapes.screenPadding,
+                32,
+              ),
+              sliver: SliverList.list(children: _details(context)),
             ),
-            sliver: SliverList.list(children: _details(context)),
           ),
         ],
       ),
@@ -162,23 +165,26 @@ class _StoreBar extends StatelessWidget {
         AppShapes.screenPadding,
         16,
       ),
-      child: FilledButton(
-        // Disabled rather than hidden when there is no link: a button that
-        // comes and goes is harder to trust than one that is plainly inert.
-        onPressed: url == null ? null : () => _open(context, url),
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.accent,
-          foregroundColor: AppColors.onAccent,
-          disabledBackgroundColor: AppColors.peachDeep,
-          minimumSize: const Size.fromHeight(60),
-          shape: const StadiumBorder(),
-        ),
-        child: Text(
-          'Ver en la tienda',
-          style: AppTypography.label.copyWith(
-            color: AppColors.onAccent,
-            fontWeight: FontWeight.w700,
-            fontSize: 16,
+      child: ContentWidth(
+        hugHeight: true,
+        child: FilledButton(
+          // Disabled rather than hidden when there is no link: a button that
+          // comes and goes is harder to trust than one that is plainly inert.
+          onPressed: url == null ? null : () => _open(context, url),
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.accent,
+            foregroundColor: AppColors.onAccent,
+            disabledBackgroundColor: AppColors.peachDeep,
+            minimumSize: const Size.fromHeight(60),
+            shape: const StadiumBorder(),
+          ),
+          child: Text(
+            'Ver en la tienda',
+            style: AppTypography.label.copyWith(
+              color: AppColors.onAccent,
+              fontWeight: FontWeight.w700,
+              fontSize: 16,
+            ),
           ),
         ),
       ),

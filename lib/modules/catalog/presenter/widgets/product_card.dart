@@ -20,7 +20,8 @@ class ProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: '${product.title}. '
+      label:
+          '${product.title}. '
           '${CatalogFormats.price(product.price, product.currency)}',
       // The title and price are already spoken by this label, so repeating the
       // children would read the same thing twice. The heart is not merged in:

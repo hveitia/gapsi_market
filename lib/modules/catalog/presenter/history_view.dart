@@ -10,6 +10,7 @@ import 'package:rekluti_test/modules/catalog/bloc/search_history_state.dart';
 import 'package:rekluti_test/modules/catalog/domain/search_term.dart';
 import 'package:rekluti_test/modules/catalog/presenter/catalog_formats.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/catalog_message.dart';
+import 'package:rekluti_test/shared/widgets/responsive.dart';
 
 /// The full list of stored searches.
 class HistoryView extends StatelessWidget {
@@ -60,25 +61,27 @@ class HistoryView extends StatelessWidget {
   }
 
   Widget _list(BuildContext context, List<SearchTerm> terms) {
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(
-        AppShapes.screenPadding,
-        8,
-        AppShapes.screenPadding,
-        100,
+    return ContentWidth(
+      child: ListView.separated(
+        padding: const EdgeInsets.fromLTRB(
+          AppShapes.screenPadding,
+          8,
+          AppShapes.screenPadding,
+          100,
+        ),
+        itemCount: terms.length + 1,
+        separatorBuilder: (BuildContext context, int index) =>
+            SizedBox(height: index == 0 ? 0 : 12),
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return _Header(count: terms.length);
+          }
+          return _HistoryRow(
+            entry: terms[index - 1],
+            onTap: () => onTermSelected(context, terms[index - 1].term),
+          );
+        },
       ),
-      itemCount: terms.length + 1,
-      separatorBuilder: (BuildContext context, int index) =>
-          SizedBox(height: index == 0 ? 0 : 12),
-      itemBuilder: (BuildContext context, int index) {
-        if (index == 0) {
-          return _Header(count: terms.length);
-        }
-        return _HistoryRow(
-          entry: terms[index - 1],
-          onTap: () => onTermSelected(context, terms[index - 1].term),
-        );
-      },
     );
   }
 }
