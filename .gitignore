@@ -46,3 +46,9 @@ app.*.map.json
 
 # Local working notes (never commit)
 instructions/EXAMEN.md
+
+# Design reference (local only)
+diseño/
+
+# Local tooling cache
+.atl/
