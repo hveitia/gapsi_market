@@ -62,6 +62,9 @@ dependencies:
   phosphor_flutter: ^2.1.0
   # Opens the product page in the browser from the detail screen.
   url_launcher: ^6.3.2
+  # Password hashing. A deliberately slow, salted KDF: a general purpose digest
+  # such as SHA-256 is far too fast to protect a stored password.
+  bcrypt: ^1.2.0
 
 dev_dependencies:
   flutter_test:
