@@ -15,7 +15,7 @@ import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
 import 'package:rekluti_test/modules/auth/presenter/landing_view.dart';
 import 'package:rekluti_test/modules/auth/presenter/sign_in_view.dart';
 import 'package:rekluti_test/modules/auth/presenter/splash_view.dart';
-import 'package:rekluti_test/modules/auth/presenter/widgets/sign_in_prompt.dart';
+import 'package:rekluti_test/modules/auth/presenter/widgets/auth_header_action.dart';
 
 class _MockAuthBloc extends MockBloc<AuthEvent, AuthState>
     implements AuthBloc {}
@@ -179,7 +179,7 @@ void main() {
 
   // The prompt is what gives a guest a way back, so it has to disappear the
   // moment there is a session and appear whenever there is not.
-  group('the sign in prompt', () {
+  group('the account control', () {
     Future<void> pumpPrompt(WidgetTester tester, AuthState state) async {
       whenListen(bloc, const Stream<AuthState>.empty(), initialState: state);
 
@@ -192,7 +192,7 @@ void main() {
                 GoRoute(
                   path: AppRoutePaths.home,
                   builder: (BuildContext context, GoRouterState state) =>
-                      const Scaffold(body: SignInPrompt()),
+                      const Scaffold(body: AuthHeaderAction()),
                 ),
                 ...authRoutes,
               ],
@@ -211,12 +211,41 @@ void main() {
       expect(find.text('Iniciar sesión'), findsOneWidget);
     });
 
-    testWidgets('disappears once there is a session', (
+    testWidgets('turns into the account once there is a session', (
       WidgetTester tester,
     ) async {
       await pumpPrompt(tester, const AuthSignedIn(_user));
 
       expect(find.text('Iniciar sesión'), findsNothing);
+      expect(find.text('Hector'), findsOneWidget);
+    });
+
+    // Nothing should be offered until the stored session has been read, or the
+    // invitation to sign in would flicker away in front of a returning user.
+    testWidgets('offers nothing while the session is still unread', (
+      WidgetTester tester,
+    ) async {
+      await pumpPrompt(tester, const AuthUnknown());
+
+      expect(find.text('Iniciar sesión'), findsNothing);
+      expect(find.text('Hector'), findsNothing);
+    });
+
+    // Signing out on the spot next to the greeting would end a session by
+    // accident, so it lives behind a menu.
+    testWidgets('signs out from the account menu', (
+      WidgetTester tester,
+    ) async {
+      await pumpPrompt(tester, const AuthSignedIn(_user));
+
+      await tester.tap(find.text('Hector'));
+      await tester.pumpAndSettle();
+      expect(find.text('Cerrar sesión'), findsOneWidget);
+
+      await tester.tap(find.text('Cerrar sesión'));
+      await tester.pumpAndSettle();
+
+      verify(() => bloc.add(const AuthSignOutRequested())).called(1);
     });
 
     testWidgets('takes the guest back to the landing screen', (

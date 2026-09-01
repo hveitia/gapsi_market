@@ -9,7 +9,7 @@ import 'package:rekluti_test/modules/auth/bloc/auth_bloc.dart';
 import 'package:rekluti_test/modules/auth/bloc/auth_event.dart';
 import 'package:rekluti_test/modules/auth/datasource/local/auth_migrations.dart';
 import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
-import 'package:rekluti_test/modules/auth/presenter/widgets/sign_in_prompt.dart';
+import 'package:rekluti_test/modules/auth/presenter/widgets/auth_header_action.dart';
 import 'package:rekluti_test/modules/catalog/bloc/favorites_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/favorites_event.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
@@ -52,7 +52,7 @@ Future<void> main() async {
       ...authRoutes,
       // The catalogue offers the way back into the auth flow, but never learns
       // what that is: main is where both modules are already known.
-      ...buildCatalogRoutes(searchHeaderAction: const SignInPrompt()),
+      ...buildCatalogRoutes(searchHeaderAction: const AuthHeaderAction()),
     ],
     // Re-evaluates the guard whenever the session changes, so signing in moves
     // the user without any screen having to navigate.
