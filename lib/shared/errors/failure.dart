@@ -8,7 +8,13 @@ import 'package:equatable/equatable.dart';
 ///
 /// A [Failure] never carries user facing copy. It describes *what* happened;
 /// deciding *how* to word it belongs to the UI.
-sealed class Failure extends Equatable {
+///
+/// Failures are thrown rather than returned in a wrapper type. Services throw,
+/// blocs catch and emit an error state, which is the shape every Flutter
+/// reviewer already reads fluently and costs no extra dependency. Because the
+/// hierarchy is sealed, a `switch` over a caught failure is still exhaustive,
+/// so the guarantee a result type is usually reached for is preserved.
+sealed class Failure extends Equatable implements Exception {
   const Failure({this.debugMessage});
 
   /// Technical detail intended for logs, never for the screen.

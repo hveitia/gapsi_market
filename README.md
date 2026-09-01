@@ -123,6 +123,17 @@ exhaustivo, en lugar de dejarlo pasar en tiempo de ejecución. Los fallos no
 transportan texto para el usuario: declaran qué ocurrió y exponen `isRetryable`,
 dejando la redacción a la capa de presentación.
 
+Los fallos se lanzan como excepciones en lugar de devolverse envueltos en un tipo
+resultado. Los servicios lanzan, los blocs capturan y emiten un estado de error:
+es la forma que cualquier persona que revise Flutter lee de inmediato y no cuesta
+una dependencia adicional. Como la jerarquía es sellada, un `switch` sobre el
+fallo capturado sigue siendo exhaustivo, de modo que se conserva la garantía por
+la que normalmente se recurre a un tipo resultado.
+
+Esa regla aplica a lo excepcional. Los desenlaces esperados de una operación
+—que una contraseña no coincida, que un correo ya esté registrado— no son
+excepciones: se modelan como valor de retorno del propio servicio.
+
 ### Pruebas
 
 `flutter_test` con `bloc_test` para las secuencias de estados, `mocktail` para
