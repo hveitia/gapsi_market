@@ -23,7 +23,11 @@ abstract final class CatalogRoutePaths {
 /// Search and history live in a shell so switching between them keeps each
 /// one's scroll position. The detail screen is pushed over the shell, so it
 /// covers the navigation bar the way the design draws it.
-final List<RouteBase> catalogRoutes = <RouteBase>[
+///
+/// [searchHeaderAction] is a slot in the search header. Taking a widget rather
+/// than building one keeps this module free of any other: what belongs there is
+/// decided where every module is already known.
+List<RouteBase> buildCatalogRoutes({Widget? searchHeaderAction}) => <RouteBase>[
   StatefulShellRoute.indexedStack(
     builder:
         (
@@ -36,8 +40,10 @@ final List<RouteBase> catalogRoutes = <RouteBase>[
         routes: <RouteBase>[
           GoRoute(
             path: CatalogRoutePaths.search,
-            builder: (BuildContext context, GoRouterState state) =>
-                SearchView(onProductSelected: _openProduct),
+            builder: (BuildContext context, GoRouterState state) => SearchView(
+              onProductSelected: _openProduct,
+              headerAction: searchHeaderAction,
+            ),
           ),
         ],
       ),

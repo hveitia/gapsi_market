@@ -15,6 +15,7 @@ import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
 import 'package:rekluti_test/modules/auth/presenter/landing_view.dart';
 import 'package:rekluti_test/modules/auth/presenter/sign_in_view.dart';
 import 'package:rekluti_test/modules/auth/presenter/splash_view.dart';
+import 'package:rekluti_test/modules/auth/presenter/widgets/sign_in_prompt.dart';
 
 class _MockAuthBloc extends MockBloc<AuthEvent, AuthState>
     implements AuthBloc {}
@@ -173,6 +174,60 @@ void main() {
       );
 
       expect(find.text('Correo o contraseña incorrectos'), findsOneWidget);
+    });
+  });
+
+  // The prompt is what gives a guest a way back, so it has to disappear the
+  // moment there is a session and appear whenever there is not.
+  group('the sign in prompt', () {
+    Future<void> pumpPrompt(WidgetTester tester, AuthState state) async {
+      whenListen(bloc, const Stream<AuthState>.empty(), initialState: state);
+
+      await tester.pumpWidget(
+        BlocProvider<AuthBloc>.value(
+          value: bloc,
+          child: MaterialApp.router(
+            routerConfig: buildAppRouter(
+              routes: <RouteBase>[
+                GoRoute(
+                  path: AppRoutePaths.home,
+                  builder: (BuildContext context, GoRouterState state) =>
+                      const Scaffold(body: SignInPrompt()),
+                ),
+                ...authRoutes,
+              ],
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('offers a way in while browsing as a guest', (
+      WidgetTester tester,
+    ) async {
+      await pumpPrompt(tester, const AuthSignedOut());
+
+      expect(find.text('Iniciar sesión'), findsOneWidget);
+    });
+
+    testWidgets('disappears once there is a session', (
+      WidgetTester tester,
+    ) async {
+      await pumpPrompt(tester, const AuthSignedIn(_user));
+
+      expect(find.text('Iniciar sesión'), findsNothing);
+    });
+
+    testWidgets('takes the guest back to the landing screen', (
+      WidgetTester tester,
+    ) async {
+      await pumpPrompt(tester, const AuthSignedOut());
+
+      await tester.tap(find.text('Iniciar sesión'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(LandingView), findsOneWidget);
     });
   });
 }

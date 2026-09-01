@@ -294,4 +294,43 @@ void main() {
       expect(node.properties.label, 'Quitar de favoritos');
     });
   });
+
+  // A guest must keep a way into the auth flow: choosing to browse without an
+  // account should not be a one way door.
+  group('the header slot', () {
+    testWidgets('shows whatever the composition put there', (
+      WidgetTester tester,
+    ) async {
+      whenListen(search, const Stream<SearchState>.empty(),
+          initialState: const SearchIdle());
+
+      await tester.pumpWidget(
+        MultiBlocProvider(
+          providers: <BlocProvider<dynamic>>[
+            BlocProvider<SearchBloc>.value(value: search),
+            BlocProvider<SearchHistoryBloc>.value(value: history),
+            BlocProvider<FavoritesBloc>.value(value: favorites),
+          ],
+          child: MaterialApp(
+            home: SearchView(
+              onProductSelected: (BuildContext _, Product _) {},
+              headerAction: const Text('iniciar sesión'),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('iniciar sesión'), findsOneWidget);
+    });
+
+    testWidgets('leaves the header alone when nothing was given', (
+      WidgetTester tester,
+    ) async {
+      await pumpSearch(tester, const SearchIdle());
+
+      expect(find.text('iniciar sesión'), findsNothing);
+      expect(find.text('Hola, buenas compras'), findsOneWidget);
+    });
+  });
 }

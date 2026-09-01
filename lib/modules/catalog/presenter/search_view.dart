@@ -32,10 +32,21 @@ const List<String> kSuggestedTerms = <String>[
 
 /// The search screen: field, results and every state they can be in.
 class SearchView extends StatefulWidget {
-  const SearchView({required this.onProductSelected, super.key});
+  const SearchView({
+    required this.onProductSelected,
+    this.headerAction,
+    super.key,
+  });
 
   /// Navigation is handed in, so this screen does not depend on the router.
   final void Function(BuildContext context, Product product) onProductSelected;
+
+  /// Dropped into the right of the header.
+  ///
+  /// A slot rather than a widget this file builds, so the catalogue never has
+  /// to import the auth module to offer a way into it. What goes here is
+  /// decided where both modules are already known.
+  final Widget? headerAction;
 
   @override
   State<SearchView> createState() => _SearchViewState();
@@ -118,13 +129,28 @@ class _SearchViewState extends State<SearchView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     if (state is SearchIdle) ...<Widget>[
-                      Text('Hola, buenas compras', style: AppTypography.meta),
-                      Text(
-                        'Mercado',
-                        style: AppTypography.titleSm.copyWith(
-                          color: AppColors.accent,
-                          fontSize: 22,
-                        ),
+                      Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  'Hola, buenas compras',
+                                  style: AppTypography.meta,
+                                ),
+                                Text(
+                                  'Mercado',
+                                  style: AppTypography.titleSm.copyWith(
+                                    color: AppColors.accent,
+                                    fontSize: 22,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          if (widget.headerAction != null) widget.headerAction!,
+                        ],
                       ),
                       const SizedBox(height: 14),
                     ],
