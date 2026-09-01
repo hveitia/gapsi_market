@@ -50,4 +50,25 @@ final List<Migration> catalogMigrations = <Migration>[
       )
     ''');
   },
+
+  (DatabaseExecutor db) async {
+    // Results are cached because the service is slow: measured against the real
+    // endpoint, the first byte arrives eight to ten seconds after the request.
+    // Repeating a term is common, since the history exists to invite it.
+    //
+    // The products are stored as JSON rather than as one row each. A cached
+    // page is only ever read or replaced whole, so a relational shape would buy
+    // nothing and cost a join.
+    await db.execute('''
+      CREATE TABLE cached_pages (
+        term          TEXT    NOT NULL,
+        page          INTEGER NOT NULL,
+        products      TEXT    NOT NULL,
+        max_page      INTEGER,
+        total_results INTEGER,
+        cached_at     INTEGER NOT NULL,
+        PRIMARY KEY (term, page)
+      )
+    ''');
+  },
 ];

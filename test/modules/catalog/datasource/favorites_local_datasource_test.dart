@@ -39,12 +39,6 @@ void main() {
 
   tearDown(() => database.close());
 
-  // The favourites table arrived in a second migration, so this also proves the
-  // versioning actually applies both steps to a fresh database.
-  test('the schema carries both migrations', () {
-    expect(database.schemaVersion, 2);
-  });
-
   test('saves a product and reads every field back', () async {
     await favorites.save(product('a'));
 

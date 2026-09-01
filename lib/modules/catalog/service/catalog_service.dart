@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:rekluti_test/modules/catalog/contract/catalog_cache_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/catalog_contract.dart';
 import 'package:rekluti_test/modules/catalog/contract/catalog_remote_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/search_history_datasource.dart';
@@ -15,11 +16,24 @@ class CatalogService implements CatalogContract {
   const CatalogService({
     required CatalogRemoteDataSource remote,
     required SearchHistoryDataSource history,
+    required CatalogCacheDataSource cache,
+    this.cacheTtl = defaultCacheTtl,
   }) : _remote = remote,
-       _history = history;
+       _history = history,
+       _cache = cache;
+
+  /// How long a cached page is worth serving.
+  ///
+  /// The service takes eight to ten seconds to answer, so a repeated term is
+  /// the difference between an instant list and a long wait. Twenty minutes is
+  /// short enough that a price cannot drift far and long enough to cover the
+  /// way the history invites the same search again.
+  static const Duration defaultCacheTtl = Duration(minutes: 20);
 
   final CatalogRemoteDataSource _remote;
   final SearchHistoryDataSource _history;
+  final CatalogCacheDataSource _cache;
+  final Duration cacheTtl;
 
   @override
   Future<ProductPage> search({
@@ -27,20 +41,68 @@ class CatalogService implements CatalogContract {
     required int page,
     CancelToken? cancelToken,
   }) async {
-    final ProductPage result = await _remote.search(
+    final ProductPage result = await _load(
       keyword: keyword,
       page: page,
       cancelToken: cancelToken,
     );
 
-    // Only the first page, and only once the request came back: paging deeper
+    // Only the first page, and only once the results came back: paging deeper
     // is the same search, and a term whose search failed would offer the user
-    // a query that never worked.
+    // a query that never worked. A cached answer still counts as searched.
     if (page == 1) {
       await _remember(keyword, result.totalResults);
     }
 
     return result;
+  }
+
+  /// A fresh cached page if there is one, otherwise the service.
+  Future<ProductPage> _load({
+    required String keyword,
+    required int page,
+    CancelToken? cancelToken,
+  }) async {
+    final ProductPage? cached = await _readCache(keyword, page);
+    if (cached != null) {
+      return cached;
+    }
+
+    final ProductPage fetched = await _remote.search(
+      keyword: keyword,
+      page: page,
+      cancelToken: cancelToken,
+    );
+
+    // An empty page is not cached: it is how the end of the results is
+    // recognised, and storing it would freeze that answer for twenty minutes.
+    if (fetched.products.isNotEmpty) {
+      await _writeCache(keyword, fetched);
+    }
+
+    return fetched;
+  }
+
+  /// Reading the cache can never break a search: a storage problem simply
+  /// means the request goes out as it would have anyway.
+  Future<ProductPage?> _readCache(String keyword, int page) async {
+    try {
+      return await _cache.read(term: keyword, page: page, maxAge: cacheTtl);
+    } on Object {
+      return null;
+    }
+  }
+
+  Future<void> _writeCache(String keyword, ProductPage page) async {
+    try {
+      await _cache.write(term: keyword, page: page);
+      // Pruning here rather than on a schedule keeps the table bounded without
+      // anything having to remember to sweep it.
+      await _cache.evictExpired(cacheTtl);
+    } on Object {
+      // The results were already delivered; failing to keep a copy costs
+      // nothing but the next search's speed.
+    }
   }
 
   @override

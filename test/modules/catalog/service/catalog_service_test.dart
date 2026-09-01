@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rekluti_test/modules/catalog/contract/catalog_cache_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/catalog_remote_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/search_history_datasource.dart';
 import 'package:rekluti_test/modules/catalog/domain/product.dart';
@@ -13,6 +14,8 @@ class _MockRemote extends Mock implements CatalogRemoteDataSource {}
 
 class _MockHistory extends Mock implements SearchHistoryDataSource {}
 
+class _MockCache extends Mock implements CatalogCacheDataSource {}
+
 const Product _product = Product(
   id: '1',
   title: 'Nintendo Switch',
@@ -24,14 +27,34 @@ ProductPage _page(int page, {List<Product> products = const <Product>[_product]}
     ProductPage(products: products, page: page, totalResults: 860);
 
 void main() {
+  setUpAll(() {
+    registerFallbackValue(Duration.zero);
+    registerFallbackValue(_page(1));
+  });
+
   late _MockRemote remote;
   late _MockHistory history;
+  late _MockCache cache;
   late CatalogService service;
 
   setUp(() {
     remote = _MockRemote();
     history = _MockHistory();
-    service = CatalogService(remote: remote, history: history);
+    cache = _MockCache();
+    service = CatalogService(remote: remote, history: history, cache: cache);
+
+    // Cold cache unless a case says otherwise.
+    when(
+      () => cache.read(
+        term: any(named: 'term'),
+        page: any(named: 'page'),
+        maxAge: any(named: 'maxAge'),
+      ),
+    ).thenAnswer((_) async => null);
+    when(
+      () => cache.write(term: any(named: 'term'), page: any(named: 'page')),
+    ).thenAnswer((_) async {});
+    when(() => cache.evictExpired(any())).thenAnswer((_) async {});
 
     when(
       () => history.remember(any(), resultCount: any(named: 'resultCount')),
@@ -159,6 +182,104 @@ void main() {
         service.recentSearches(),
         throwsA(isA<StorageFailure>()),
       );
+    });
+  });
+
+  group('cache', () {
+    void whenCached(ProductPage page) {
+      when(
+        () => cache.read(
+          term: any(named: 'term'),
+          page: any(named: 'page'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenAnswer((_) async => page);
+    }
+
+    // The whole point: the service takes eight to ten seconds, so a repeated
+    // term must not go out again.
+    test('serves a fresh page without touching the network', () async {
+      whenCached(_page(1));
+
+      final ProductPage result = await service.search(
+        keyword: 'nintendo',
+        page: 1,
+      );
+
+      expect(result.products, hasLength(1));
+      verifyNever(
+        () => remote.search(
+          keyword: any(named: 'keyword'),
+          page: any(named: 'page'),
+          cancelToken: any(named: 'cancelToken'),
+        ),
+      );
+    });
+
+    test('a cached search is still recorded in the history', () async {
+      whenCached(_page(1));
+
+      await service.search(keyword: 'nintendo', page: 1);
+
+      verify(() => history.remember('nintendo', resultCount: 860)).called(1);
+    });
+
+    test('stores what it fetched and prunes what expired', () async {
+      answerWith(_page(1));
+
+      await service.search(keyword: 'nintendo', page: 1);
+
+      verify(
+        () => cache.write(term: 'nintendo', page: any(named: 'page')),
+      ).called(1);
+      verify(() => cache.evictExpired(CatalogService.defaultCacheTtl)).called(1);
+    });
+
+    // An empty page is how the end of the results is recognised. Freezing that
+    // answer for twenty minutes would keep the list from ever growing again.
+    test('never caches an empty page', () async {
+      answerWith(
+        const ProductPage(products: <Product>[], page: 3, totalResults: 0),
+      );
+
+      await service.search(keyword: 'nintendo', page: 3);
+
+      verifyNever(
+        () => cache.write(term: any(named: 'term'), page: any(named: 'page')),
+      );
+    });
+
+    // The cache is an optimisation. A broken one must cost speed, never results.
+    test('falls back to the network when the cache cannot be read', () async {
+      when(
+        () => cache.read(
+          term: any(named: 'term'),
+          page: any(named: 'page'),
+          maxAge: any(named: 'maxAge'),
+        ),
+      ).thenThrow(StateError('disk'));
+      answerWith(_page(1));
+
+      final ProductPage result = await service.search(
+        keyword: 'nintendo',
+        page: 1,
+      );
+
+      expect(result.products, hasLength(1));
+    });
+
+    test('still returns results when the cache cannot be written', () async {
+      answerWith(_page(1));
+      when(
+        () => cache.write(term: any(named: 'term'), page: any(named: 'page')),
+      ).thenThrow(const StorageFailure());
+
+      final ProductPage result = await service.search(
+        keyword: 'nintendo',
+        page: 1,
+      );
+
+      expect(result.products, hasLength(1));
     });
   });
 }

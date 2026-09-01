@@ -3,11 +3,13 @@ import 'package:get_it/get_it.dart';
 import 'package:rekluti_test/modules/catalog/bloc/favorites_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_history_bloc.dart';
+import 'package:rekluti_test/modules/catalog/contract/catalog_cache_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/catalog_contract.dart';
 import 'package:rekluti_test/modules/catalog/contract/catalog_remote_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/favorites_contract.dart';
 import 'package:rekluti_test/modules/catalog/contract/favorites_datasource.dart';
 import 'package:rekluti_test/modules/catalog/contract/search_history_datasource.dart';
+import 'package:rekluti_test/modules/catalog/datasource/local/catalog_cache_local_datasource.dart';
 import 'package:rekluti_test/modules/catalog/datasource/local/favorites_local_datasource.dart';
 import 'package:rekluti_test/modules/catalog/datasource/local/search_history_local_datasource.dart';
 import 'package:rekluti_test/modules/catalog/datasource/remote/walmart_remote_datasource.dart';
@@ -25,10 +27,15 @@ void registerCatalogDependencies(GetIt injector) {
     () => SqliteSearchHistoryDataSource(injector<AppDatabase>()),
   );
 
+  injector.registerLazySingleton<CatalogCacheDataSource>(
+    () => SqliteCatalogCacheDataSource(injector<AppDatabase>()),
+  );
+
   injector.registerLazySingleton<CatalogContract>(
     () => CatalogService(
       remote: injector<CatalogRemoteDataSource>(),
       history: injector<SearchHistoryDataSource>(),
+      cache: injector<CatalogCacheDataSource>(),
     ),
   );
 
