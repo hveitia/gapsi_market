@@ -24,4 +24,30 @@ final List<Migration> catalogMigrations = <Migration>[
       )
     ''');
   },
+
+  // Appended, never merged into the migration above: that one has already run
+  // on databases in existence, so correcting or extending it means adding a
+  // step after it. The schema version is the length of this list, so it moves
+  // on its own.
+  (DatabaseExecutor db) async {
+    // The whole product is stored, not just its id. The service offers no way
+    // to fetch one product, so a favourite that kept only a reference could
+    // never be rendered again. Keeping the fields means favourites also work
+    // with no network at all.
+    await db.execute('''
+      CREATE TABLE favorites (
+        id            TEXT    PRIMARY KEY,
+        title         TEXT    NOT NULL,
+        price         REAL,
+        currency      TEXT    NOT NULL,
+        image_url     TEXT,
+        thumbnail_url TEXT,
+        description   TEXT,
+        rating        REAL,
+        review_count  INTEGER,
+        product_url   TEXT,
+        saved_at      INTEGER NOT NULL
+      )
+    ''');
+  },
 ];
