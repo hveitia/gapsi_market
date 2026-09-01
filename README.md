@@ -1,160 +1,171 @@
 # Gapsi Market
 
-Product search app built with Flutter for the GAPSI practical exercise. It
-searches a Walmart catalogue through the Axesso RapidAPI service, paginates as
-the user scrolls, and keeps the search history on the device.
+Aplicación de búsqueda de productos desarrollada en Flutter para el ejercicio
+práctico de GAPSI. Consulta un catálogo de Walmart a través del servicio Axesso
+en RapidAPI, pagina conforme el usuario hace scroll y conserva el historial de
+búsquedas en el dispositivo.
 
 ---
 
-## Environment
+## Entorno
 
-| Tool | Version |
+| Herramienta | Versión |
 | --- | --- |
 | Flutter | 3.38.3 (stable) |
 | Dart | 3.10.1 |
 
-The project is pinned to this toolchain (`environment.sdk: ^3.10.1`). Newer
-releases of `go_router` and `sqflite` require Dart `^3.12.0`, so the pubspec
-stays on the versions this SDK can resolve. Upgrading the SDK is a deliberate
-decision, not a side effect of a dependency bump.
+El proyecto está fijado a esta cadena de herramientas (`environment.sdk: ^3.10.1`).
+Las versiones más recientes de `go_router` y `sqflite` requieren Dart `^3.12.0`,
+por lo que el `pubspec` permanece en las versiones que este SDK puede resolver.
+Actualizar el SDK es una decisión deliberada, no un efecto secundario de subir
+una dependencia.
 
 ---
 
-## Setup
+## Instalación
 
 ```bash
 flutter pub get
 ```
 
-### API key
+### Llave de API
 
-The app calls RapidAPI, which requires a subscription key. **The key is not in
-this repository and never will be** — it is delivered separately, by email.
+La aplicación consume RapidAPI, que exige una llave de suscripción. **La llave no
+está en este repositorio y nunca lo estará**: se entrega por separado, por correo.
 
-It is read at compile time through `String.fromEnvironment`, so it is injected
-as a build flag rather than stored in a file:
-
-```bash
-flutter run --dart-define=RAPIDAPI_KEY=<key>
-```
-
-Building for release works the same way:
+Se lee en tiempo de compilación mediante `String.fromEnvironment`, de modo que se
+inyecta como bandera de compilación en lugar de almacenarse en un archivo:
 
 ```bash
-flutter build apk    --dart-define=RAPIDAPI_KEY=<key>
-flutter build ipa    --dart-define=RAPIDAPI_KEY=<key>
+flutter run --dart-define=RAPIDAPI_KEY=<llave>
 ```
 
-If the app is launched without the flag it still builds and runs, and reports
-the missing key on screen instead of failing with an opaque network error.
+La compilación para distribución funciona igual:
 
-Tests and static analysis do not need the key.
+```bash
+flutter build apk    --dart-define=RAPIDAPI_KEY=<llave>
+flutter build ipa    --dart-define=RAPIDAPI_KEY=<llave>
+```
+
+Si la aplicación se ejecuta sin la bandera, igualmente compila y arranca, e
+informa en pantalla que falta la llave en lugar de fallar con un error de red
+opaco.
+
+Las pruebas y el análisis estático no requieren la llave.
 
 ---
 
-## Running the tests
+## Ejecución de las pruebas
 
 ```bash
-flutter test       # unit and widget tests
-flutter analyze    # static analysis, expected to report no issues
+flutter test       # pruebas unitarias y de widgets
+flutter analyze    # análisis estático, no debe reportar incidencias
 ```
 
 ---
 
-## Technical decisions
+## Decisiones técnicas
 
-Every dependency is annotated in `pubspec.yaml` with the reason it is there.
-The summary below explains the choices that shape the architecture.
+Cada dependencia está anotada en `pubspec.yaml` con la razón por la que está
+presente. El resumen siguiente explica las decisiones que dan forma a la
+arquitectura.
 
-### State management — `flutter_bloc`
+### Manejo de estado — `flutter_bloc`
 
-Bloc models a screen as an explicit event in, state out flow. Search has four
-states the exercise calls for (loading, results, empty, error) plus pagination
-layered on top, and Bloc makes that a single enumerable state instead of a set
-of booleans that can contradict each other. It also keeps business logic out of
-widgets, which is what allows the search and pagination rules to be tested
-without pumping a UI. `bloc_test` asserts the exact sequence of emitted states.
+Bloc modela una pantalla como un flujo explícito de evento de entrada y estado de
+salida. La búsqueda tiene los cuatro estados que pide el ejercicio (carga,
+resultados, vacío y error) más la paginación superpuesta, y Bloc convierte eso en
+un único estado enumerable en lugar de un conjunto de banderas booleanas que
+pueden contradecirse entre sí. Además mantiene la lógica de negocio fuera de los
+widgets, que es lo que permite probar las reglas de búsqueda y paginación sin
+montar interfaz. `bloc_test` verifica la secuencia exacta de estados emitidos.
 
-### Local persistence — `sqflite` (SQLite)
+### Persistencia local — `sqflite` (SQLite)
 
-The search history must survive an app restart. SQLite was chosen over a
-key–value store because the data is relational and queried, not just read back:
-history is ordered by recency and de-duplicated by term, and favourites relate
-to products. It is also the storage engine every reviewer can inspect without
-extra tooling.
+El historial de búsquedas debe sobrevivir al reinicio de la aplicación. Se eligió
+SQLite sobre un almacén de tipo clave-valor porque los datos son relacionales y se
+consultan, no solo se leen de vuelta: el historial se ordena por recencia y se
+deduplica por término, y los favoritos se relacionan con productos. Es también el
+motor de almacenamiento que cualquier revisor puede inspeccionar sin herramientas
+adicionales.
 
-A single connection is owned by `AppDatabase`; each module contributes its own
-migration, so schema ownership stays with the feature that needs the table.
+`AppDatabase` es dueña de una única conexión; cada módulo aporta su propia
+migración, de forma que la propiedad del esquema permanece junto a la
+funcionalidad que necesita la tabla.
 
-### Networking — `dio`
+### Red — `dio`
 
-Chosen over `http` for its interceptor pipeline. The RapidAPI credentials are
-attached in exactly one place, so no data source handles the key and a new
-endpoint cannot forget it. Dio also exposes request cancellation, which the
-debounced search relies on to drop in-flight requests when the query changes.
+Se eligió sobre `http` por su cadena de interceptores. Las credenciales de
+RapidAPI se adjuntan en un solo lugar, por lo que ninguna fuente de datos maneja
+la llave y un endpoint nuevo no puede olvidarla. Dio expone además la cancelación
+de peticiones, en la que se apoya la búsqueda con retardo para descartar las
+peticiones en vuelo cuando cambia el término.
 
-### Dependency injection — `get_it`
+### Inyección de dependencias — `get_it`
 
-A service locator rather than a code generation framework: no build step, and
-blocs receive their collaborators instead of constructing them, which is what
-makes them testable against fakes. The locator instance is a parameter, so
-tests build an isolated graph rather than mutating global state.
+Un localizador de servicios en lugar de un marco de generación de código: sin paso
+de compilación adicional, y los blocs reciben sus colaboradores en vez de
+construirlos, que es lo que permite probarlos contra dobles de prueba. La
+instancia del localizador es un parámetro, de modo que las pruebas construyen un
+grafo aislado en lugar de mutar estado global.
 
-### Routing — `go_router`
+### Navegación — `go_router`
 
-Maintained by the Flutter team. Its declarative route table keeps navigation
-readable in one file, and its `redirect` hook centralises the authentication
-guard instead of scattering it across widgets.
+Mantenido por el equipo de Flutter. Su tabla de rutas declarativa mantiene la
+navegación legible en un solo archivo, y su enlace `redirect` centraliza la
+protección de rutas autenticadas en lugar de dispersarla por los widgets.
 
-### Error handling
+### Manejo de errores
 
-Failures are modelled as a `sealed` hierarchy in `lib/shared/errors`. Being
-sealed, adding a case breaks every non-exhaustive `switch` at compile time
-rather than falling through at runtime. Failures carry no user-facing copy:
-they state what happened and expose `isRetryable`, leaving the wording to the
-presentation layer.
+Los fallos se modelan como una jerarquía `sealed` en `lib/shared/errors`. Al ser
+sellada, agregar un caso rompe en tiempo de compilación todo `switch` que no sea
+exhaustivo, en lugar de dejarlo pasar en tiempo de ejecución. Los fallos no
+transportan texto para el usuario: declaran qué ocurrió y exponen `isRetryable`,
+dejando la redacción a la capa de presentación.
 
-### Testing
+### Pruebas
 
-`flutter_test` with `bloc_test` for state sequences, `mocktail` for null-safe
-fakes without code generation, and `sqflite_common_ffi` to run a real SQLite
-engine on the host VM so the persistence layer is exercised rather than mocked.
+`flutter_test` con `bloc_test` para las secuencias de estados, `mocktail` para
+dobles de prueba con seguridad de nulos y sin generación de código, y
+`sqflite_common_ffi` para ejecutar un motor SQLite real sobre la máquina
+anfitriona, de modo que la capa de persistencia se ejercita en lugar de simularse.
 
 ---
 
-## Project structure
+## Estructura del proyecto
 
 ```
 lib/
-├── app.dart                  # application widget
-├── main.dart                 # entry point: bindings, DI, router
+├── app.dart                  # widget de la aplicación
+├── main.dart                 # punto de entrada: bindings, DI, router
 ├── configs/
-│   ├── environment.dart      # build time configuration
-│   └── router/               # route table and paths
+│   ├── environment.dart      # configuración de tiempo de compilación
+│   └── router/               # tabla de rutas y constantes de ruta
 ├── modules/
-│   └── <feature>/
-│       ├── bloc/             # events, states, bloc
-│       ├── contract/         # abstractions the bloc depends on
-│       ├── datasource/       # remote (API) and local (SQLite) sources
-│       ├── domain/           # models
-│       ├── presenter/        # views and widgets
-│       └── service/          # contract implementation
+│   └── <funcionalidad>/
+│       ├── bloc/             # eventos, estados y bloc
+│       ├── contract/         # abstracciones de las que depende el bloc
+│       ├── datasource/       # fuentes remota (API) y local (SQLite)
+│       ├── domain/           # modelos
+│       ├── presenter/        # vistas y widgets
+│       └── service/          # implementación del contrato
 └── shared/
-    ├── database/             # single SQLite connection and migrations
-    ├── di/                   # service locator
-    ├── errors/               # failure model and mapping
-    └── network/              # Dio client and interceptors
+    ├── database/             # conexión única a SQLite y migraciones
+    ├── di/                   # localizador de servicios
+    ├── errors/               # modelo de fallos y su mapeo
+    └── network/              # cliente Dio e interceptores
 ```
 
-Modules are self-contained: a feature brings its own screens, its own database
-migration and its own registrations. Nothing in `shared/` or `configs/` needs to
-know which features exist.
+Los módulos son autocontenidos: una funcionalidad aporta sus propias pantallas, su
+propia migración de base de datos y sus propios registros. Nada en `shared/` ni en
+`configs/` necesita saber qué funcionalidades existen.
 
 ---
 
-## Static analysis
+## Análisis estático
 
-`analysis_options.yaml` extends `flutter_lints` with the strict language modes
-(`strict-casts`, `strict-inference`, `strict-raw-types`) and promotes
-`unawaited_futures` to an error. Unsound casts and unawaited async work fail
-analysis instead of surfacing at runtime.
+`analysis_options.yaml` extiende `flutter_lints` con los modos estrictos del
+lenguaje (`strict-casts`, `strict-inference`, `strict-raw-types`) y eleva
+`unawaited_futures` a error. Las conversiones de tipo no seguras y el trabajo
+asíncrono sin esperar fallan el análisis en lugar de aparecer en tiempo de
+ejecución.
