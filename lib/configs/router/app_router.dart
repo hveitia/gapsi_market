@@ -12,17 +12,23 @@ abstract final class AppRoutePaths {
 
 /// Builds the app's router.
 ///
-/// [routes] defaults to [appRoutes] and is a parameter rather than a hard coded
-/// list so each module can
+/// [routes], [redirect] and [refreshListenable] are parameters rather than hard
+/// coded values so each module can
 /// contribute its own screens, the same way modules contribute their database
 /// migrations. Nothing here has to import every feature.
 GoRouter buildAppRouter({
   List<RouteBase>? routes,
   String initialLocation = AppRoutePaths.home,
+  Listenable? refreshListenable,
+  GoRouterRedirect? redirect,
 }) {
   return GoRouter(
     initialLocation: initialLocation,
     routes: routes ?? appRoutes,
+    // Both are parameters so this file never imports a feature: the module that
+    // owns the rule supplies it, and the composition root wires the two.
+    refreshListenable: refreshListenable,
+    redirect: redirect,
     errorBuilder: (BuildContext context, GoRouterState state) =>
         _RouteNotFoundScreen(location: state.uri.toString()),
   );
