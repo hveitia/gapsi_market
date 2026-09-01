@@ -55,9 +55,6 @@ dependencies:
   # Declarative routing. Its `redirect` hook centralises the authentication
   # guard instead of scattering it across widgets.
   go_router: ^17.5.0
-  # Typography required by the design: Bricolage Grotesque for display and
-  # Karla for body and UI text.
-  google_fonts: ^8.2.1
   # Duotone icon set used across the navigation bar and empty states.
   phosphor_flutter: ^2.1.0
   # Opens the product page in the browser from the detail screen.
@@ -104,6 +101,24 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Bundled rather than fetched at runtime. Downloading a typeface on first
+  # launch means the app looks different with no connection, and different again
+  # a second later once it arrives. Four static files are a smaller price than
+  # that, and only the weights the design actually uses are shipped.
+  fonts:
+    - family: BricolageGrotesque
+      fonts:
+        - asset: assets/fonts/BricolageGrotesque-ExtraBold.ttf
+          weight: 800
+    - family: Karla
+      fonts:
+        - asset: assets/fonts/Karla-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Karla-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Karla-Bold.ttf
+          weight: 700
 
   # To add assets to your application, add an assets section, like this:
   # assets:

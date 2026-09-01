@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:rekluti_test/configs/theme/app_colors.dart';
 
 /// The two typefaces the specification calls for.
 ///
 /// Bricolage Grotesque carries display and headings; Karla carries body and UI
-/// text. Letter spacing is expressed in logical pixels, so the `-0.03em` of the
+/// text. Both are bundled with the app and declared in `pubspec.yaml`, so they
+/// are present the first time a frame is drawn and with no connection at all.
+///
+/// Letter spacing is expressed in logical pixels, so the `-0.03em` of the
 /// specification becomes a value proportional to each size.
 abstract final class AppTypography {
+  static const String _display = 'BricolageGrotesque';
+  static const String _body = 'Karla';
+
   static const double _displayTracking = -0.03;
 
   /// Splash and large section headers.
@@ -36,7 +41,8 @@ abstract final class AppTypography {
   ).copyWith(letterSpacing: 1.2);
 
   static TextStyle _heading(double size, {double? height}) {
-    return GoogleFonts.bricolageGrotesque(
+    return TextStyle(
+      fontFamily: _display,
       fontSize: size,
       fontWeight: FontWeight.w800,
       letterSpacing: size * _displayTracking,
@@ -51,7 +57,8 @@ abstract final class AppTypography {
     double? height,
     Color color = AppColors.ink,
   }) {
-    return GoogleFonts.karla(
+    return TextStyle(
+      fontFamily: _body,
       fontSize: size,
       fontWeight: weight,
       height: height,

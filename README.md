@@ -115,6 +115,18 @@ Mantenido por el equipo de Flutter. Su tabla de rutas declarativa mantiene la
 navegación legible en un solo archivo, y su enlace `redirect` centraliza la
 protección de rutas autenticadas en lugar de dispersarla por los widgets.
 
+### Tipografías
+
+Bricolage Grotesque y Karla se **empaquetan con la aplicación** y se declaran en
+`pubspec.yaml`, en lugar de descargarse en tiempo de ejecución. Una tipografía
+que se baja al primer arranque hace que la aplicación se vea distinta sin
+conexión, y distinta otra vez un segundo después cuando llega. Cuatro archivos
+estáticos, unos 200 KB en total, cuestan menos que esa inconsistencia. Solo se
+incluyen los pesos que el diseño realmente usa.
+
+Por eso el proyecto no depende de `google_fonts`: una vez empaquetadas, el
+paquete que las descarga no tiene nada que hacer.
+
 ### Manejo de errores
 
 Los fallos se modelan como una jerarquía `sealed` en `lib/shared/errors`. Al ser

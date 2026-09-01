@@ -2,7 +2,6 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rekluti_test/modules/catalog/bloc/favorites_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/favorites_event.dart';
@@ -45,7 +44,6 @@ Product product(String id, {String? description, double? price = 299}) =>
 
 void main() {
   setUpAll(() {
-    GoogleFonts.config.allowRuntimeFetching = false;
     registerFallbackValue(const SearchTermChanged('x'));
     registerFallbackValue(const SearchHistoryRequested());
     registerFallbackValue(const FavoritesRequested());

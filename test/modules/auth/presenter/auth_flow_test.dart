@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:rekluti_test/configs/router/app_router.dart';
 import 'package:rekluti_test/modules/auth/bloc/auth_bloc.dart';
@@ -23,12 +22,7 @@ class _MockAuthBloc extends MockBloc<AuthEvent, AuthState>
 const User _user = User(id: 7, name: 'Hector', email: 'hector@correo.com');
 
 void main() {
-  // Never reach for a font over the network in a test: it would make the suite
-  // depend on connectivity and slow every case down.
-  setUpAll(() {
-    GoogleFonts.config.allowRuntimeFetching = false;
-    registerFallbackValue(const AuthSessionRequested());
-  });
+  setUpAll(() => registerFallbackValue(const AuthSessionRequested()));
 
   late _MockAuthBloc bloc;
 
