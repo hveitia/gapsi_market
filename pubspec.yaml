@@ -68,6 +68,11 @@ dev_dependencies:
   # Null-safe mocking without code generation.
   mocktail: ^1.0.5
 
+  # Runs a real SQLite engine on the host VM. `sqflite` needs a platform
+  # channel, so without this the database layer could only be mocked. Test
+  # scope only: it never ships in the app.
+  sqflite_common_ffi: ^2.4.0+3
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
