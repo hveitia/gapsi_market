@@ -88,6 +88,17 @@ void main() {
       expect(find.byType(LandingView), findsOneWidget);
     });
 
+    // The case a returning user actually hits: the stored session resolves
+    // while the splash is still on screen, and nothing was moving them off it.
+    testWidgets('lets a restored session straight into the catalogue', (
+      WidgetTester tester,
+    ) async {
+      await pump(tester, const AuthSignedIn(_user));
+
+      expect(find.byType(SplashView), findsNothing);
+      expect(find.text('catálogo'), findsOneWidget);
+    });
+
     // Going back to a sign in form while already signed in would let someone
     // open a second session over the first.
     testWidgets('keeps a signed in user out of the auth screens', (

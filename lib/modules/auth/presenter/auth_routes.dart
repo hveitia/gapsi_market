@@ -56,8 +56,11 @@ String? authRedirect(AuthState state, GoRouterState routerState) {
     // so the landing screen never flashes in front of a returning user.
     AuthUnknown() => onSplash ? null : AuthRoutePaths.splash,
 
-    // Signed out and still parked on the splash: the read finished, move on.
+    // The read finished, so nobody stays on the splash. Both outcomes need a
+    // way off it: leaving one of them without a destination is exactly how a
+    // returning user ends up staring at it forever.
     AuthSignedOut() when onSplash => AuthRoutePaths.landing,
+    AuthSignedIn() when onSplash => AppRoutePaths.home,
 
     // Signed in: the auth screens have nothing left to offer, and going back
     // to them would let someone sign in twice.
