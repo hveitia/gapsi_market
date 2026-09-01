@@ -1,28 +1,49 @@
-# This file configures the analyzer, which statically analyzes Dart code to
-# check for errors, warnings, and lints.
+# Static analysis configuration.
 #
-# The issues identified by the analyzer are surfaced in the UI of Dart-enabled
-# IDEs (https://dart.dev/tools#ides-and-editors). The analyzer can also be
-# invoked from the command line by running `flutter analyze`.
+# The exercise requires `flutter analyze` to run clean, so this file goes beyond
+# the default lint set: the strict language modes below turn implicit `dynamic`
+# and unsound casts into analysis errors instead of runtime surprises.
+#
+# Run with: flutter analyze
 
-# The following line activates a set of recommended lints for Flutter apps,
-# packages, and plugins designed to encourage good coding practices.
 include: package:flutter_lints/flutter.yaml
 
-linter:
-  # The lint rules applied to this project can be customized in the
-  # section below to disable rules from the `package:flutter_lints/flutter.yaml`
-  # included above or to enable additional rules. A list of all available lints
-  # and their documentation is published at https://dart.dev/lints.
-  #
-  # Instead of disabling a lint rule for the entire project in the
-  # section below, it can also be suppressed for a single line of code
-  # or a specific dart file by using the `// ignore: name_of_lint` and
-  # `// ignore_for_file: name_of_lint` syntax on the line or in the file
-  # producing the lint.
-  rules:
-    # avoid_print: false  # Uncomment to disable the `avoid_print` rule
-    # prefer_single_quotes: true  # Uncomment to enable the `prefer_single_quotes` rule
+analyzer:
+  language:
+    # Reject implicit downcasts from `dynamic` (e.g. raw JSON maps).
+    strict-casts: true
+    # Reject inference that would silently resolve a type to `dynamic`.
+    strict-inference: true
+    # Reject generic types used without their type arguments.
+    strict-raw-types: true
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+  errors:
+    # Unawaited futures are the usual source of race conditions in async UI
+    # flows, so they must fail analysis rather than emit a warning.
+    unawaited_futures: error
+    # Dead or unreachable code means an intent was lost during a refactor.
+    dead_code: error
+
+  exclude:
+    - build/**
+
+linter:
+  rules:
+    # --- Consistency -------------------------------------------------------
+    - prefer_single_quotes
+    - require_trailing_commas
+    - directives_ordering
+    - always_use_package_imports
+    - sort_constructors_first
+
+    # --- Type safety -------------------------------------------------------
+    - always_declare_return_types
+    - avoid_dynamic_calls
+    - prefer_final_locals
+
+    # --- Async -------------------------------------------------------------
+    - unawaited_futures
+
+    # --- Noise reduction ---------------------------------------------------
+    - avoid_redundant_argument_values
+    - unnecessary_lambdas

@@ -31,20 +31,42 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+
+  # State management. Enforces a unidirectional event -> state flow and keeps
+  # business logic out of widgets.
+  flutter_bloc: ^9.1.1
+  # Value equality for states and events, so Bloc can skip identical emissions.
+  equatable: ^2.1.0
+
+  # HTTP client. Chosen over `http` for its interceptor pipeline, which is where
+  # the RapidAPI key and error mapping are applied in a single place.
+  dio: ^5.11.0
+
+  # Local persistence (search history, credentials, cached results).
+  sqflite: ^2.4.2+1
+  # Builds platform-correct paths for the SQLite database file.
+  path: ^1.9.1
+
+  # Service locator. Keeps blocs decoupled from concrete implementations so
+  # they can be tested against fakes.
+  get_it: ^9.2.1
+
+  # Declarative routing. Its `redirect` hook centralises the authentication
+  # guard instead of scattering it across widgets.
+  go_router: ^17.5.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  # The "flutter_lints" package below contains a set of recommended lints to
-  # encourage good coding practices. The lint set provided by the package is
-  # activated in the `analysis_options.yaml` file located at the root of your
-  # package. See that file for information about deactivating specific lint
-  # rules and activating additional ones.
+  # Recommended lint set, extended in `analysis_options.yaml`.
   flutter_lints: ^6.0.0
+
+  # Declarative assertions over the sequence of states a Bloc emits.
+  bloc_test: ^10.0.0
+  # Null-safe mocking without code generation.
+  mocktail: ^1.0.5
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
