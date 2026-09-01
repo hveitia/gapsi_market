@@ -90,6 +90,9 @@ dev_dependencies:
   # channel, so without this the database layer could only be mocked. Test
   # scope only: it never ships in the app.
   sqflite_common_ffi: ^2.4.0+3
+  # Generates every icon size iOS and Android ask for from a single source
+  # image. Build tooling only: it never ships in the app.
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -132,3 +135,22 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# Icon generation. Run with: dart run flutter_launcher_icons
+#
+# The source lives in assets/icon but is deliberately not declared under
+# `flutter: assets:`. It is consumed at build time to produce the platform icons,
+# so bundling it too would ship a megabyte the app never reads.
+flutter_launcher_icons:
+  image_path: "assets/icon/app_icon.png"
+  android: true
+  ios: true
+  # iOS rejects an icon with an alpha channel, so it is flattened on the way out.
+  remove_alpha_ios: true
+  # Android masks adaptive icons into whatever shape the launcher uses, so the
+  # foreground is the circle alone on a transparent field, over a white
+  # background. Passing the full square would let the mask clip the artwork.
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/app_icon_foreground.png"
+  adaptive_icon_foreground_inset: 20
+  min_sdk_android: 21

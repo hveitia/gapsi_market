@@ -15,7 +15,7 @@ class GapsiMarketApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      title: 'Gapsi Market',
+      title: 'GAPSI Market',
       theme: buildAppTheme(),
       routerConfig: router,
       debugShowCheckedModeBanner: false,
