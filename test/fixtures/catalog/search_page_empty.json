@@ -1,0 +1,18 @@
+{
+  "item": {
+    "props": {
+      "pageProps": {
+        "initialData": {
+          "searchResult": {
+            "aggregatedCount": 0,
+            "hasMorePages": false,
+            "paginationV2": {
+              "maxPage": 1
+            },
+            "itemStacks": []
+          }
+        }
+      }
+    }
+  }
+}
