@@ -134,6 +134,63 @@ Esa regla aplica a lo excepcional. Los desenlaces esperados de una operación
 —que una contraseña no coincida, que un correo ya esté registrado— no son
 excepciones: se modelan como valor de retorno del propio servicio.
 
+### Búsqueda y paginación
+
+La búsqueda es el centro del ejercicio y sus reglas son propiedades del código,
+no convenciones a recordar.
+
+El texto que se escribe pasa por un *debounce*, de modo que una ráfaga de
+pulsaciones se convierte en una sola petición, y el transformador es
+`restartable`: si llega un término nuevo, el manejador del anterior se abandona
+en lugar de competir por emitir. La petición en vuelo además se cancela, así una
+respuesta lenta de un término viejo no puede caer encima de una más reciente.
+Una cancelación es flujo normal y nunca se muestra como error.
+
+Las páginas adicionales están protegidas dos veces. El transformador `droppable`
+descarta los eventos repetidos que produce el desplazamiento cerca del final, y
+el propio estado los rechaza mediante `canLoadMore`, que es falso mientras una
+página está en curso y una vez que los resultados se agotaron.
+
+Que un fallo al paginar no borre lo ya cargado no depende de recordar no
+hacerlo: el fallo es un campo del estado que contiene los productos
+(`SearchResults.pageLoad`), así que no existe un camino que reemplace uno por
+otro.
+
+### El servicio
+
+El endpoint no responde con un documento de API: devuelve el estado completo de
+la página de búsqueda de Walmart, alrededor de un megabyte por petición, con los
+productos varios niveles por debajo. El mapeo se escribió contra respuestas
+reales capturadas, y de esa medición salieron cuatro decisiones.
+
+La respuesta trae un segundo bloque titulado *"Shop trending items"* cuyos
+productos no tienen relación con la consulta, así que solo se lee el bloque de
+la grilla. La grilla además viene rellenada con celdas sin identificador, nombre
+ni imagen, que se descartan en lugar de dibujarse como tarjetas vacías.
+
+El precio se resuelve por una cadena de alternativas porque **el mismo endpoint
+responde con dos formas distintas según la página**. En unas, `priceDetails.priceLines`
+viene poblado y las cadenas con formato están vacías; en otras esa lista no
+existe y el valor solo aparece como texto. Leer una sola de las dos deja la mitad
+del catálogo en cero.
+
+El final de los resultados se deduce de que una página vuelva vacía, no de las
+señales que trae la respuesta: `hasMorePages` es `false` incluso en la primera
+página de catorce, y `maxPage` informa 14 en esa misma página y 1 en la
+decimocuarta. Ambas se conservan solo como tope de seguridad.
+
+Las páginas se solapan: una respuesta real repitió 14 de 45 productos de la
+página anterior, por lo que los resultados se fusionan por identificador en
+lugar de concatenarse.
+
+### Pantalla de detalle
+
+No realiza ninguna petición. El ejercicio indica que solo es necesario consultar
+ese servicio, y la respuesta de búsqueda ya trae título, precio, imagen y
+descripción, así que el producto viaja con la navegación. La pantalla abre de
+inmediato y sigue funcionando sin red. Alrededor de uno de cada seis productos
+llega sin descripción, y la pantalla lo dice en lugar de mostrar un bloque vacío.
+
 ### Pruebas
 
 `flutter_test` con `bloc_test` para las secuencias de estados, `mocktail` para
@@ -151,8 +208,11 @@ lib/
 ├── main.dart                 # punto de entrada: bindings, DI, router
 ├── configs/
 │   ├── environment.dart      # configuración de tiempo de compilación
-│   └── router/               # tabla de rutas y constantes de ruta
+│   ├── router/               # constructor del router y constantes de ruta
+│   └── theme/                # tokens de color, tipografía y forma
 ├── modules/
+│   ├── auth/                 # registro y acceso locales
+│   ├── catalog/              # búsqueda, detalle e historial
 │   └── <funcionalidad>/
 │       ├── bloc/             # eventos, estados y bloc
 │       ├── contract/         # abstracciones de las que depende el bloc
