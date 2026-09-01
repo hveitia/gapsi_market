@@ -183,6 +183,18 @@ Las páginas se solapan: una respuesta real repitió 14 de 45 productos de la
 página anterior, por lo que los resultados se fusionan por identificador en
 lugar de concatenarse.
 
+### Favoritos
+
+Se guarda el producto completo, no solo su identificador. El servicio no ofrece
+forma de consultar un producto individual, así que un favorito que conservara
+únicamente una referencia no podría volver a mostrarse nunca; guardar los campos
+además hace que la pantalla de favoritos funcione sin red.
+
+La tabla llegó como una **segunda migración añadida a la lista**, no fusionada
+con la primera: esa ya se ejecutó en bases de datos existentes, de modo que
+ampliar el esquema significa agregar un paso después. La versión es la longitud
+de la lista, así que avanzó sola.
+
 ### Pantalla de detalle
 
 No realiza ninguna petición. El ejercicio indica que solo es necesario consultar
