@@ -183,6 +183,26 @@ Las páginas se solapan: una respuesta real repitió 14 de 45 productos de la
 página anterior, por lo que los resultados se fusionan por identificador en
 lugar de concatenarse.
 
+### Caché de resultados
+
+Medido contra el endpoint real, el primer byte llega entre ocho y diez segundos
+después de la petición, con la conexión ya establecida en menos de medio
+segundo. Esa espera es del servicio y no se puede reducir desde el cliente, pero
+sí se puede evitar repetirla: las páginas de resultados se guardan localmente y
+se sirven durante **veinte minutos**. El historial existe justamente para
+invitar a repetir una búsqueda, así que ese camino se recorre seguido.
+
+La vigencia forma parte de la consulta y no de una comprobación posterior, de
+modo que una fila vencida ni siquiera se lee. Las filas expiradas se eliminan en
+cada escritura, así la tabla permanece acotada sin que nada tenga que recordar
+limpiarla.
+
+Una página vacía nunca se guarda: es la señal de que los resultados se
+terminaron, y conservarla congelaría esa respuesta durante toda la ventana. La
+caché es una optimización y se comporta como tal: si no se puede leer, la
+petición sale igual; si no se puede escribir, solo se pierde velocidad en la
+búsqueda siguiente.
+
 ### Favoritos
 
 Se guarda el producto completo, no solo su identificador. El servicio no ofrece
