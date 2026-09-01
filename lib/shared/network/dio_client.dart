@@ -7,7 +7,14 @@ import 'package:rekluti_test/shared/network/rapid_api_interceptor.dart';
 /// stalled connection would leave the search spinner up forever.
 const Duration _connectTimeout = Duration(seconds: 15);
 const Duration _sendTimeout = Duration(seconds: 15);
-const Duration _receiveTimeout = Duration(seconds: 20);
+
+/// Generous on purpose, and measured rather than guessed.
+///
+/// The catalogue service takes eight to ten seconds to produce its first byte
+/// on a wired connection, and then sends about a megabyte. A tighter budget
+/// would report a timeout for searches that were simply going to be slow, which
+/// is a worse answer than making the user wait.
+const Duration _receiveTimeout = Duration(seconds: 45);
 
 /// Builds the [Dio] instance used across the app.
 ///
