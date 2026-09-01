@@ -55,6 +55,13 @@ dependencies:
   # Declarative routing. Its `redirect` hook centralises the authentication
   # guard instead of scattering it across widgets.
   go_router: ^17.5.0
+  # Typography required by the design: Bricolage Grotesque for display and
+  # Karla for body and UI text.
+  google_fonts: ^8.2.1
+  # Duotone icon set used across the navigation bar and empty states.
+  phosphor_flutter: ^2.1.0
+  # Opens the product page in the browser from the detail screen.
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
