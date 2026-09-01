@@ -65,6 +65,14 @@ dependencies:
   # Password hashing. A deliberately slow, salted KDF: a general purpose digest
   # such as SHA-256 is far too fast to protect a stored password.
   bcrypt: ^1.2.0
+  # Supplies the debounce the search transformer is built on.
+  stream_transform: ^2.1.2
+  # Event transformers from the bloc team. Search uses restartable so a new
+  # term abandons the request already in flight.
+  bloc_concurrency: ^0.3.0
+  # Caches product thumbnails on disk. An infinite scroll would otherwise
+  # re-download every image each time the list is rebuilt.
+  cached_network_image: ^3.4.1
 
 dev_dependencies:
   flutter_test:
