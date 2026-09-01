@@ -5,6 +5,7 @@ import 'package:rekluti_test/configs/theme/app_theme.dart';
 import 'package:rekluti_test/configs/theme/app_typography.dart';
 import 'package:rekluti_test/modules/catalog/domain/product.dart';
 import 'package:rekluti_test/modules/catalog/presenter/catalog_formats.dart';
+import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.dart';
 
 /// One product in the results list.
 ///
@@ -21,9 +22,10 @@ class ProductCard extends StatelessWidget {
       button: true,
       label: '${product.title}. '
           '${CatalogFormats.price(product.price, product.currency)}',
-      // The children already describe the card; announcing them again would
-      // read the same thing twice.
-      excludeSemantics: true,
+      // The title and price are already spoken by this label, so repeating the
+      // children would read the same thing twice. The heart is not merged in:
+      // it is a separate control and has to stay reachable on its own.
+      container: true,
       child: Material(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppShapes.cardRadius),
@@ -38,6 +40,7 @@ class ProductCard extends StatelessWidget {
                 ProductThumbnail(url: product.thumbnailUrl, size: 82),
                 const SizedBox(width: 14),
                 Expanded(child: _details()),
+                FavoriteHeart(product: product),
               ],
             ),
           ),

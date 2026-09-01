@@ -89,6 +89,10 @@ List<NavDestination> catalogDestinations() => <NavDestination>[
     label: 'Buscar',
   ),
   NavDestination(
+    icon: PhosphorIcons.heart(PhosphorIconsStyle.duotone),
+    label: 'Favoritos',
+  ),
+  NavDestination(
     icon: PhosphorIcons.clockCounterClockwise(PhosphorIconsStyle.duotone),
     label: 'Historial',
   ),

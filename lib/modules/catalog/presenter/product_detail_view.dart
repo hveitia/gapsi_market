@@ -5,6 +5,7 @@ import 'package:rekluti_test/configs/theme/app_theme.dart';
 import 'package:rekluti_test/configs/theme/app_typography.dart';
 import 'package:rekluti_test/modules/catalog/domain/product.dart';
 import 'package:rekluti_test/modules/catalog/presenter/catalog_formats.dart';
+import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -110,25 +111,32 @@ class _Hero extends StatelessWidget {
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(AppShapes.screenPadding),
-              child: Align(
-                alignment: Alignment.topLeft,
-                child: Material(
-                  color: AppColors.onAccent,
-                  shape: const CircleBorder(),
-                  child: InkWell(
-                    onTap: () => Navigator.of(context).maybePop(),
-                    customBorder: const CircleBorder(),
-                    child: SizedBox.square(
-                      dimension: AppShapes.minTouchTarget,
-                      child: Icon(
-                        PhosphorIcons.arrowLeft(PhosphorIconsStyle.bold),
-                        color: AppColors.ink,
-                        size: 20,
-                        semanticLabel: 'Volver',
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Material(
+                    color: AppColors.onAccent,
+                    shape: const CircleBorder(),
+                    child: InkWell(
+                      onTap: () => Navigator.of(context).maybePop(),
+                      customBorder: const CircleBorder(),
+                      child: SizedBox.square(
+                        dimension: AppShapes.minTouchTarget,
+                        child: Icon(
+                          PhosphorIcons.arrowLeft(PhosphorIconsStyle.bold),
+                          color: AppColors.ink,
+                          size: 20,
+                          semanticLabel: 'Volver',
+                        ),
                       ),
                     ),
                   ),
-                ),
+                  FavoriteHeart(
+                    product: product,
+                    background: AppColors.onAccent,
+                  ),
+                ],
               ),
             ),
           ),

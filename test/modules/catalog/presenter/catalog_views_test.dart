@@ -4,6 +4,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:rekluti_test/modules/catalog/bloc/favorites_bloc.dart';
+import 'package:rekluti_test/modules/catalog/bloc/favorites_event.dart';
+import 'package:rekluti_test/modules/catalog/bloc/favorites_state.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_event.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_history_bloc.dart';
@@ -14,6 +17,7 @@ import 'package:rekluti_test/modules/catalog/domain/product.dart';
 import 'package:rekluti_test/modules/catalog/domain/search_term.dart';
 import 'package:rekluti_test/modules/catalog/presenter/product_detail_view.dart';
 import 'package:rekluti_test/modules/catalog/presenter/search_view.dart';
+import 'package:rekluti_test/modules/catalog/presenter/widgets/favorite_heart.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_card.dart';
 import 'package:rekluti_test/modules/catalog/presenter/widgets/product_skeleton.dart';
 import 'package:rekluti_test/shared/errors/failure.dart';
@@ -23,6 +27,9 @@ class _MockSearch extends MockBloc<SearchEvent, SearchState>
 
 class _MockHistory extends MockBloc<SearchHistoryEvent, SearchHistoryState>
     implements SearchHistoryBloc {}
+
+class _MockFavorites extends MockBloc<FavoritesEvent, FavoritesState>
+    implements FavoritesBloc {}
 
 Product product(String id, {String? description, double? price = 299}) =>
     Product(
@@ -41,14 +48,22 @@ void main() {
     GoogleFonts.config.allowRuntimeFetching = false;
     registerFallbackValue(const SearchTermChanged('x'));
     registerFallbackValue(const SearchHistoryRequested());
+    registerFallbackValue(const FavoritesRequested());
   });
 
   late _MockSearch search;
   late _MockHistory history;
+  late _MockFavorites favorites;
 
   setUp(() {
     search = _MockSearch();
     history = _MockHistory();
+    favorites = _MockFavorites();
+    whenListen(
+      favorites,
+      const Stream<FavoritesState>.empty(),
+      initialState: FavoritesLoaded(<Product>[]),
+    );
     whenListen(
       history,
       const Stream<SearchHistoryState>.empty(),
@@ -68,6 +83,7 @@ void main() {
         providers: <BlocProvider<dynamic>>[
           BlocProvider<SearchBloc>.value(value: search),
           BlocProvider<SearchHistoryBloc>.value(value: history),
+          BlocProvider<FavoritesBloc>.value(value: favorites),
         ],
         child: MaterialApp(
           home: SearchView(
@@ -189,7 +205,10 @@ void main() {
   group('the detail screen', () {
     Future<void> pumpDetail(WidgetTester tester, Product value) async {
       await tester.pumpWidget(
-        MaterialApp(home: ProductDetailView(product: value)),
+        BlocProvider<FavoritesBloc>.value(
+          value: favorites,
+          child: MaterialApp(home: ProductDetailView(product: value)),
+        ),
       );
       await tester.pumpAndSettle();
     }
@@ -222,6 +241,57 @@ void main() {
       await pumpDetail(tester, product('a', price: null));
 
       expect(find.text('Precio no disponible'), findsOneWidget);
+    });
+  });
+
+  group('the heart', () {
+    testWidgets('offers to save a product that is not a favourite', (
+      WidgetTester tester,
+    ) async {
+      await pumpSearch(
+        tester,
+        SearchResults(
+          term: 'nintendo',
+          products: <Product>[product('a')],
+          page: 1,
+        ),
+      );
+
+      await tester.tap(find.byType(FavoriteHeart));
+      await tester.pump();
+
+      verify(() => favorites.add(FavoriteToggled(product('a')))).called(1);
+    });
+
+    testWidgets('reads as pressed for one already saved', (
+      WidgetTester tester,
+    ) async {
+      whenListen(
+        favorites,
+        const Stream<FavoritesState>.empty(),
+        initialState: FavoritesLoaded(<Product>[product('a')]),
+      );
+
+      await pumpSearch(
+        tester,
+        SearchResults(
+          term: 'nintendo',
+          products: <Product>[product('a')],
+          page: 1,
+        ),
+      );
+
+      final Semantics node = tester.widget<Semantics>(
+        find
+            .descendant(
+              of: find.byType(FavoriteHeart),
+              matching: find.byType(Semantics),
+            )
+            .first,
+      );
+
+      expect(node.properties.toggled, isTrue);
+      expect(node.properties.label, 'Quitar de favoritos');
     });
   });
 }

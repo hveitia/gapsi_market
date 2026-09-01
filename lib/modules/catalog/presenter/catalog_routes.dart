@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_event.dart';
 import 'package:rekluti_test/modules/catalog/domain/product.dart';
+import 'package:rekluti_test/modules/catalog/presenter/favorites_view.dart';
 import 'package:rekluti_test/modules/catalog/presenter/history_view.dart';
 import 'package:rekluti_test/modules/catalog/presenter/product_detail_view.dart';
 import 'package:rekluti_test/modules/catalog/presenter/search_view.dart';
@@ -12,6 +13,7 @@ import 'package:rekluti_test/modules/catalog/presenter/widgets/floating_nav_bar.
 /// Locations owned by the catalog module.
 abstract final class CatalogRoutePaths {
   static const String search = '/';
+  static const String favorites = '/favorites';
   static const String history = '/history';
   static const String product = '/product';
 }
@@ -36,6 +38,15 @@ final List<RouteBase> catalogRoutes = <RouteBase>[
             path: CatalogRoutePaths.search,
             builder: (BuildContext context, GoRouterState state) =>
                 SearchView(onProductSelected: _openProduct),
+          ),
+        ],
+      ),
+      StatefulShellBranch(
+        routes: <RouteBase>[
+          GoRoute(
+            path: CatalogRoutePaths.favorites,
+            builder: (BuildContext context, GoRouterState state) =>
+                FavoritesView(onProductSelected: _openProduct),
           ),
         ],
       ),

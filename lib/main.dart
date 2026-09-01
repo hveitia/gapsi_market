@@ -9,6 +9,8 @@ import 'package:rekluti_test/modules/auth/bloc/auth_bloc.dart';
 import 'package:rekluti_test/modules/auth/bloc/auth_event.dart';
 import 'package:rekluti_test/modules/auth/datasource/local/auth_migrations.dart';
 import 'package:rekluti_test/modules/auth/presenter/auth_routes.dart';
+import 'package:rekluti_test/modules/catalog/bloc/favorites_bloc.dart';
+import 'package:rekluti_test/modules/catalog/bloc/favorites_event.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_bloc.dart';
 import 'package:rekluti_test/modules/catalog/bloc/search_history_bloc.dart';
 import 'package:rekluti_test/modules/catalog/catalog_module.dart';
@@ -38,6 +40,11 @@ Future<void> main() async {
   final AuthBloc authBloc = locator<AuthBloc>()
     ..add(const AuthSessionRequested());
 
+  // Loaded up front so the hearts in the first list of results are already
+  // right, rather than filling in a moment after the products appear.
+  final FavoritesBloc favoritesBloc = locator<FavoritesBloc>()
+    ..add(const FavoritesRequested());
+
   final GoRouter router = buildAppRouter(
     initialLocation: AuthRoutePaths.splash,
     routes: <RouteBase>[...authRoutes, ...catalogRoutes],
@@ -53,6 +60,7 @@ Future<void> main() async {
       providers: <BlocProvider<dynamic>>[
         BlocProvider<AuthBloc>.value(value: authBloc),
         BlocProvider<SearchBloc>.value(value: locator<SearchBloc>()),
+        BlocProvider<FavoritesBloc>.value(value: favoritesBloc),
         BlocProvider<SearchHistoryBloc>.value(
           value: locator<SearchHistoryBloc>(),
         ),
